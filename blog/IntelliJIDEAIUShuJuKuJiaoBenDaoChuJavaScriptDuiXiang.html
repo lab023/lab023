@@ -1,0 +1,307 @@
+<html>
+<head>
+
+    <!-- header.ftl -->
+<title>IntelliJ IDEA IU数据库脚本: 导出JavaScript对象 | Lab 023</title>
+<h1><a href="https://lab023.github.io">Lab 023</a></h1>
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<!-- css.ftl -->
+<link href="/css/default_main.css" type="text/css" rel="stylesheet">
+<link href="/css/prism.css" type="text/css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="main_div">
+
+    <div>
+        <h2><a id="IntelliJIDEAIUShuJuKuJiaoBenDaoChuJavaScriptDuiXiang" name="IntelliJ IDEA IU数据库脚本: 导出JavaScript对象" href="/blog/IntelliJIDEAIUShuJuKuJiaoBenDaoChuJavaScriptDuiXiang.html">IntelliJ IDEA IU数据库脚本: 导出JavaScript对象</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+                <p>使用方法: Database -&gt; 右键数据库表 -&gt; Scripted Extensions -&gt; vuejs.groovy</p>
+<pre class="language-groovy"><code>import com.intellij.database.model.DasTable
+import com.intellij.database.model.ObjectKind
+import com.intellij.database.util.Case
+import com.intellij.database.util.DasUtil
+
+/*
+ * Available context bindings:
+ *   SELECTION   Iterable&lt;DasObject&gt;
+ *   PROJECT     project
+ *   FILES       files helper
+ *
+ * Last Modify: 2018-03-20
+ */
+
+typeMapping = [
+        (~/(?i)int/)                      : "Long",
+        (~/(?i)float|double|decimal|real/): "Double",
+        (~/(?i)datetime|ts/)              : "Timestamp",
+        (~/(?i)date/)                     : "Date",
+        (~/(?i)time/)                     : "Timestamp",
+        (~/(?i)/)                         : "String"
+]
+
+FILES.chooseDirectoryAndSave("Choose directory", "Choose where to store generated files") { dir -&gt;
+    SELECTION.filter { it instanceof DasTable &amp;&amp; it.getKind() == ObjectKind.TABLE }.each { generate(it, dir) }
+}
+
+def generate(table, dir) {
+    def className = javaName2(table.getName(), true)
+    className = Case.LOWER.apply(className[0]) + className[1..-1]
+    def fields = calcFields(table)
+    new File(dir, className + ".js").withPrintWriter { out -&gt; generate(table, out, className, fields) }
+}
+
+def generate(table, out, className, fields) {
+    // +js
+    getJsObject(out, fields)
+    getJsArray(out, fields)
+    getJsEntity(out, fields)
+    // -js
+}
+
+// 字段内容
+def calcFields(table) {
+    DasUtil.getColumns(table).reduce([]) { fields = [{}], col -&gt;
+        def spec = Case.LOWER.apply(col.getDataType().getSpecification())
+        def typeStr = typeMapping.find { p, t -&gt; p.matcher(spec).find() }.value
+        def colName = col.getName() + ""
+
+        // PK字段的开头必须是 idt_
+        if (colName ==~ /(^idt$|^idt_.*)/) {
+            fields += [[
+                               name : colName,
+                               type : typeStr,
+                               annos: "  @Id" + (typeStr == "Long" ? "\n    @GeneratedValue(strategy = GenerationType.IDENTITY)" : "")]]
+        } else {
+            fields += [[
+                               name : colName,
+                               type : typeStr,
+                               annos: ""]]
+        }
+    }
+}
+
+// 表名转类名
+def javaName(str, capitalize) {
+    def s = str.split(/[^\p{Alnum}]/).collect { def s = Case.LOWER.apply(it).capitalize() }.join("")
+    capitalize ? s : Case.LOWER.apply(s[0]) + s[1..-1]
+}
+
+def javaName2(str, capitalize) {
+    def s = str.replaceAll("^t_", "").split(/[^\p{Alnum}]/).collect {
+        def s = Case.LOWER.apply(it).capitalize()
+    }.join("")
+    capitalize ? s : Case.LOWER.apply(s[0]) + s[1..-1]
+
+}
+
+// 驼峰命令
+static String toCamelCase(String text, boolean capitalized = false) {
+    text = text.replaceAll("(_)([A-Za-z0-9])", { Object[] it -&gt; it[2].toUpperCase() })
+    return capitalized ? capitalize(text) : text
+}
+
+// 蛇形命名
+static String toSnakeCase(String text) {
+    text.replaceAll(/([A-Z])/, /_$1/).toLowerCase().replaceAll(/^_/, '')
+}
+
+// 首字母大写
+def firstUpper(str) {
+    Case.UPPER.apply(str[0]) + str[1..-1]
+}
+
+/* JS对象 */
+
+def getJsObject(out, fields) {
+    out.println("")
+    out.println("// JS Object")
+
+    fs = ""
+    fs += "export function keyObject() {\n"
+    fs += "  return {\n"
+    fields.each() {
+        fs += "    ${toCamelCase(it.name)}: '',\n"
+    }
+    fs = fs.replaceAll(',\\n$', "")
+    fs += "\n  }\n"
+    fs += "}\n"
+    out.println(fs)
+}
+
+/* JS数组 */
+
+def getJsArray(out, fields) {
+    out.println("// JS array")
+
+    fs = ""
+    fs += "export function keyArray() {\n"
+    fs += "  return ["
+    fields.each() {
+        fs += "'${toCamelCase(it.name)}', "
+    }
+    fs = fs.replaceAll(', $', "")
+    fs += "]\n"
+    fs += "}\n"
+    out.println(fs)
+}
+
+/* JS复杂对象 */
+// { display_name: '序号', key: 'idt', canSearch: true, canSort: true, showInExtend: true, type: 'String', cantNull: true }
+def getJsEntity(out, fields) {
+    out.println("// JS Entity")
+
+    fs = ""
+    fs += "export function entity() {\n"
+    fs += "  return [\n"
+    fields.each() {
+        fs += "    { display_name: '_', key: '${toCamelCase(it.name)}', exclude: false, canSearch: ${it.type != "Timestamp" &amp;&amp; it.type != "Double"}, canSort: true, showInExtend: ${it.type == "Timestamp"}, type: '${it.type}', canNull: ${it.type != "String"}, canEdit: ${!it.name.contains("idt")} },\n"
+    }
+    fs = fs.replaceAll(',\\n$', "")
+    fs += "\n  ]\n"
+    fs += "}\n"
+    out.println(fs)
+}</code></pre>
+<p>&nbsp;</p>
+<p>导出示例</p>
+<pre class="language-javascript"><code>// JS Object
+export function keyObject() {
+  return {
+    idt: '',
+    tBusinessUserIdt: '',
+    mobileNumber: '',
+    sendTime: '',
+    sendFlag: '',
+    ip: '',
+    appToken: '',
+    appId: '',
+    appVersion: '',
+    appChannel: '',
+    appOs: '',
+    appOsVersion: '',
+    appTerminalVendor: '',
+    appTerminalId: '',
+    appTerminalModel: '',
+    respCode: '',
+    respMessage: '',
+    respBizId: '',
+    smsType: '',
+    smsContent: '',
+    addTime: ''
+  }
+}
+
+// JS array
+export function keyArray() {
+  return ['idt', 'tBusinessUserIdt', 'mobileNumber', 'sendTime', 'sendFlag', 'ip', 'appToken', 'appId', 'appVersion', 'appChannel', 'appOs', 'appOsVersion', 'appTerminalVendor', 'appTerminalId', 'appTerminalModel', 'respCode', 'respMessage', 'respBizId', 'smsType', 'smsContent', 'addTime']
+}
+
+// JS Entity
+export function entity() {
+  return [
+    { display_name: '_', key: 'idt', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: false },
+    { display_name: '_', key: 'tBusinessUserIdt', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: false },
+    { display_name: '_', key: 'mobileNumber', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'sendTime', exclude: false, canSearch: false, canSort: true, showInExtend: true, type: 'Timestamp', canNull: true, canEdit: true },
+    { display_name: '_', key: 'sendFlag', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'Long', canNull: true, canEdit: true },
+    { display_name: '_', key: 'ip', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'appToken', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'appId', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'appVersion', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'appChannel', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'appOs', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'appOsVersion', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'appTerminalVendor', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'appTerminalId', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'appTerminalModel', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'respCode', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'respMessage', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'respBizId', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'smsType', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'smsContent', exclude: false, canSearch: true, canSort: true, showInExtend: false, type: 'String', canNull: false, canEdit: true },
+    { display_name: '_', key: 'addTime', exclude: false, canSearch: false, canSort: true, showInExtend: true, type: 'Timestamp', canNull: true, canEdit: true }
+  ]
+}
+
+</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-6cdd2a3f3bfb46cfa2c8b34ffdffcb1e-1.html?f=Java开发">Java开发 6</a> <a class="a-tag" href="/tag/tag-ecdfbaec143d4868992f4f8272a6995b-1.html?f=Vue.js">Vue.js 1</a><a class="a-tag" href="/tag/tag-75ce94fedc024798b7cb5c9b90989b6e-1.html?f=Spring">Spring 2</a><a class="a-tag" href="/tag/tag-ba22da08d37249a6b09743a96d3fac0c-1.html?f=JavaScript">JavaScript 1</a></div>
+            <div class="blog_sign"><a>Roy</a><a>2019-5-3</a></div>
+        </div>
+    </div>
+
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {
+    this.page.url = 'https://lab023.github.io/blog/IntelliJIDEAIUShuJuKuJiaoBenDaoChuJavaScriptDuiXiang.html';
+    this.page.identifier = 'IntelliJIDEAIUShuJuKuJiaoBenDaoChuJavaScriptDuiXiang';
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lab023.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<!-- footer.ftl -->
+<script>
+var flag = false;
+function showDonation(){
+    if(flag){
+        flag = false;
+        document.getElementsByClassName('d-donation')[0].style.display = 'none';
+    }else{
+        flag = true;
+        document.getElementsByClassName('d-donation')[0].style.display = 'block';
+    }
+}
+</script>
+
+<div class="d-donation">
+    <ul>
+        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
+    </ul>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/lab023/lab023.github.io/issues" >报告错误</a> | <a href="/LICENSE.txt" target="_blank">代码许可</a> | <a href="javascript:void(0);"  onclick="showDonation()">赞助一下</a></p>
+</div>
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130961613-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130961613-1');
+</script>
+</div>
+
+<!-- js.ftl -->
+<script src="/js/prism.js"></script>
+<script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+</body>
+</html>

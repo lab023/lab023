@@ -1,0 +1,416 @@
+<html>
+<head>
+
+    <!-- header.ftl -->
+<title>第1页 | Lab 023</title>
+<h1><a href="https://lab023.github.io">Lab 023</a></h1>
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<!-- css.ftl -->
+<link href="/css/default_main.css" type="text/css" rel="stylesheet">
+<link href="/css/prism.css" type="text/css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="main_div">
+
+    <div>
+        <h2><a id="YongDockerVagrantDaJianMesosShiYanHuanJing" name="用Docker、Vagrant搭建Mesos实验环境" href="/blog/YongDockerVagrantDaJianMesosShiYanHuanJing.html">用Docker、Vagrant搭建Mesos实验环境</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <p>Mesos躺在我的学习列表里面2年了，最近终于一口气玩了一把，也算完成一桩心事。</p>
+<p>整个实验做下来，感觉生产环境可能原生安装会比较好，隔着Docker会有一些奇怪的问题。鉴于没有实战经验，也就不浪费时间瞎说了。</p>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-00f2de205f3e4737bfb1fa2574bdb6a5-1.html?f=学习">学习 1</a> <a class="a-tag" href="/tag/tag-43f6dca0eaf040ae9c527bc0a9dad327-1.html?f=Mesos">Mesos 1</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/YongDockerVagrantDaJianMesosShiYanHuanJing.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-9-21</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="IntelliJIDEAIUShuJuKuJiaoBenDaoChuJPAJDBCEntityWuLombok" name="IntelliJ IDEA IU数据库脚本: 导出JPA+JDBC Entity(无Lombok)" href="/blog/IntelliJIDEAIUShuJuKuJiaoBenDaoChuJPAJDBCEntityWuLombok.html">IntelliJ IDEA IU数据库脚本: 导出JPA+JDBC Entity(无Lombok)</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <p>使用方法: Database -&gt; 右键数据库表 -&gt; Scripted Extensions -&gt; yourScript.groovy</p>
+<p>生成Entity Class</p>
+<p>内详</p>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-6cdd2a3f3bfb46cfa2c8b34ffdffcb1e-1.html?f=Java开发">Java开发 6</a> <a class="a-tag" href="/tag/tag-e75db186149a4d2fb15c5d1dba530356-1.html?f=Java">Java 2</a><a class="a-tag" href="/tag/tag-739faf8831284b65870dcdafac237a49-1.html?f=JPA/JDBC">JPA/JDBC 2</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/IntelliJIDEAIUShuJuKuJiaoBenDaoChuJPAJDBCEntityWuLombok.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-8-9</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="JavaHeKotlinHunYongYuDaoDeGeZhongWenTi" name="Java和Kotlin混用遇到的各种问题" href="/blog/JavaHeKotlinHunYongYuDaoDeGeZhongWenTi.html">Java和Kotlin混用遇到的各种问题</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <p>最近在旧Java项目中添加了Kotlin代码，感受到了新语法的魅力，也遇到了一些不尽如意的问题。使用不深，如有不妥还请指正。</p>
+<p>&nbsp;</p>
+<p><b>加分项</b></p>
+<ol>
+<li>SpringBoot集成无压力，快速嵌入。</li>
+<li>语法简洁有效，既减少了冗余代码，又提高了可读性。</li>
+<li>文档相对完善，遇到问题基本可以搜到解决方案。</li>
+</ol>
+<p>&nbsp;</p>
+<p><b>减分项</b></p>
+<ol>
+<li>不支持Java代码的Lombok注释，或者说支持有缺陷。我配置了delombok也不能正确解析我自动生成的Entity类。</li>
+<li>格式化代码很卡，我的2019.2 IU格式化或Inspection都会很卡顿（32G内存 + i7 7500U + 固态硬盘）。按理说自家产品支持力度应该很够，然并卵。</li>
+<li>Java和Kotlin互调问题。Kotlin调用Java无压力，Java调用Kotlin就要注意权限了。</li>
+<li>写算法部分能带来大量快感，日常代码并不会有太多优势。</li>
+<li>不喜欢Kotlin的List类，没有集成Collection的大部分方法。</li>
+</ol>
+<p>&nbsp;</p>
+<p>人生在于尝试，有的人浅尝辄止，有的人深入学习。<i><strike>而我在IDEA卡顿问题解决之前，不会再深入使用。</strike></i></p>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-6cdd2a3f3bfb46cfa2c8b34ffdffcb1e-1.html?f=Java开发">Java开发 6</a> </div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/JavaHeKotlinHunYongYuDaoDeGeZhongWenTi.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-8-9</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="ElementJieTuShiYonghtml2canvasLeiKu" name="Element截图（使用html2canvas类库）" href="/blog/ElementJieTuShiYonghtml2canvasLeiKu.html">Element截图（使用html2canvas类库）</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <p>安装类库</p>
+<pre class="language-bash"><code>npm install html2canvas --save</code></pre>
+<p>&nbsp;</p>
+<p><i>main.js</i>引入类库</p>
+<pre class="language-javascript"><code>import html2canvas from 'html2canvas'
+const MyPlugin = {
+  install(Vue, options) {
+    window.html2canvas = html2canvas
+  }
+}
+Vue.use(MyPlugin)</code></pre>
+<p>&nbsp;</p>
+<p>打印区域<i>capture</i></p>
+<pre class="language-markup"><code>&lt;el-dialog :title="tempValues.bTable.title" id="capture" :visible.sync="tempValues.bTable.visiable"  width="550px" height="978px" top="0vh" &gt;
+  &lt;!-- bTable --&gt;
+  &lt;el-table :data="tempValues.bTable.actionDataList" :cell-style="{'border': '1px dashed #ebeef5'}"  :cell-class-name="_custom_tableCellClassNamePrint" :show-header="false" :key="tempValues.bTable.tableKey" v-loading="tempValues.bTable.loading" element-loading-text="正在加载数据" border fit highlight-current-row style="background: white!important; background-color: white!important; width: 100%"&gt;
+    &lt;el-table-column header-align="center" :width="_custom_setColumnWidth(item.key)" :align="setColumnAlign(item.key)" :label="item.display_name" :key="item.key" v-for="item in visiblePrint"&gt;
+      &lt;template slot-scope="scope"&gt;
+        &lt;span style="font-size: 20px; font-weight: 400; width: 100%; height: 100%; display:block; padding: 8px 0 8px;"&gt;{{ scope.row[item.key] }}&lt;/span&gt;
+      &lt;/template&gt;
+    &lt;/el-table-column&gt;
+  &lt;/el-table&gt;
+&lt;/el-dialog&gt;</code></pre>
+<p>&nbsp;</p>
+<p>打印方法</p>
+<pre class="language-javascript"><code>async print(fileName) {
+  setTimeout(async function() {
+    window.html2canvas(document.querySelector('#capture').firstChild).then(canvas =&gt; {
+      // npm install file-saver
+      canvas.toBlob(function(blob) {
+        saveAs(blob, fileName + '.png')
+      })
+    })
+  }, 2000)
+}</code></pre>
+<p>&nbsp;</p>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-3ba9cece117140ca82056c0f92c15549-1.html?f=Web开发">Web开发 1</a> </div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/ElementJieTuShiYonghtml2canvasLeiKu.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-8-9</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="JavaShuChuWenZiBiaoGeGengXinV2" name="Java输出文字表格（更新V2）" href="/blog/JavaShuChuWenZiBiaoGeGengXinV2.html">Java输出文字表格（更新V2）</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <p>自己动手封装了一个String打印表格的类，兼容中文。</p>
+<p>推荐一个真正的等宽Coding字体 <a href="https://github.com/be5invis/Sarasa-Gothic" target="_blank" rel="noopener">更纱黑体 Sarasa Term SC</a></p>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-6cdd2a3f3bfb46cfa2c8b34ffdffcb1e-1.html?f=Java开发">Java开发 6</a> </div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/JavaShuChuWenZiBiaoGeGengXinV2.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-6-30</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="AnsiblePlaybookZiDongPeiZhiSSH" name="Ansible Playbook自动配置SSH" href="/blog/AnsiblePlaybookZiDongPeiZhiSSH.html">Ansible Playbook自动配置SSH</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <pre class="language-yaml"><code>---
+- name: 16_PRO_SSHConfig.yml
+  hosts: all
+  gather_facts: yes
+  vars:
+    allow_root: True
+    allow_password: False
+    ssh_port: 34522
+    ssh_change_port: True
+
+  tasks:
+    - name: Delete GSS
+      lineinfile: dest=/etc/ssh/sshd_config state=absent regexp=".*GSS.*"
+  
+    - name: Set UseDNS no
+      lineinfile: dest=/etc/ssh/sshd_config regexp=".*UseDNS.*" line="UseDNS no"
+
+    - name: if permit root login via publickey
+      lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin " insertafter="^#PermitRootLogin " line="PermitRootLogin without-password" 
+      when: allow_root == 'True'
+
+    - name: if not allow rootlogin
+      lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin " insertafter="^#PermitRootLogin " line="PermitRootLogin no"
+      when: allow_root == 'False'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication yes"
+      when: allow_password == 'True'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication " line="PasswordAuthentication no"
+      when: allow_password == 'False'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp="^RSAAuthentication " line="RSAAuthentication yes"
+      when: allow_password == 'False'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp="^PubkeyAuthentication " line="PubkeyAuthentication yes"
+      when: allow_password == 'False'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp="^AuthorizedKeysFile " line="AuthorizedKeysFile .ssh/authorized_keys"
+      when: allow_password == 'False'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp=".*Port.*" line="Port {{ssh_port}}"
+      when: ssh_change_port == 'True'
+
+    - name: restart sshd service
+      service: name=sshd state=restarted</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a><a class="a-tag" href="/tag/tag-8be888738248407aa574057256d807ad-1.html?f=OpenSSH">OpenSSH 2</a><a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookZiDongPeiZhiSSH.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="AnsiblePlaybookShenQingLetsEncryptZhengShu" name="Ansible Playbook申请Let's Encrypt证书" href="/blog/AnsiblePlaybookShenQingLetsEncryptZhengShu.html">Ansible Playbook申请Let's Encrypt证书</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <pre class="language-markup"><code>---
+- name: Let's Encrypt CA CentOS 7.3[0.0.1] @LastModify 2018-11-13
+  hosts: all
+  gather_facts: yes
+  vars:
+    domain: www.***.com
+    mail: ****@qq.com
+
+  tasks:
+  - yum: name=yum-utils state=latest
+  - shell: yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-REGION-rhel-server-optional
+  - yum: name=python2-certbot-nginx state=latest
+  - cron:
+      name: "let's encrypt cron"
+      minute: "0"
+      hour: "0,12"
+      job: "python -c 'import random; import time; time.sleep(random.random() * 3600)' &amp;&amp; certbot renew --rsa-key-size 4096"
+  - name: certbot --rsa-key-size 4096 --nginx -d {{ domain }} --agree-tos --email {{ mail }} --no-bootstrap --server https://acme-v02.api.letsencrypt.org/directory
+    shell: certbot --rsa-key-size 4096 --nginx -d {{ domain }} --agree-tos --email {{ mail }} --no-bootstrap --server https://acme-v02.api.letsencrypt.org/directory
+    ignore_errors: yes
+  - name: test renew
+    shell: certbot renew --dry-run
+    ignore_errors: yes
+  # - shell: openssl dhparam -out /etc/letsencrypt/live/{{domain}}/dhparams.pem 4096</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-c20b4b5f29f644baba84ccad6dbb5017-1.html?f=Nginx">Nginx 3</a><a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a><a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookShenQingLetsEncryptZhengShu.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="AnsiblePlaybookNeiHeCanShuDiaoYou" name="Ansible Playbook内核参数调优" href="/blog/AnsiblePlaybookNeiHeCanShuDiaoYou.html">Ansible Playbook内核参数调优</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <pre class="language-yaml"><code>---
+- name: Linux kernel tuning [0.0.2]
+  hosts: all
+  gather_facts: no
+  vars:
+
+  tasks:
+    - sysctl: name={{ item.key }} value={{ item.value }} state=present
+      with_items:
+        - { key: "vm.swappiness", value: "5" }
+        - { key: "net.ipv4.tcp_syncookies", value: "1" }
+        - { key: "net.ipv4.conf.all.log_martians", value: "0" }
+        - { key: "net.core.somaxconn", value: "65535" }
+        - { key: "net.ipv4.tcp_max_syn_backlog", value: "30000" }
+        - { key: "net.core.netdev_max_backlog", value: "32768" }
+        - { key: "fs.file-max", value: "1000000" }
+        - { key: "net.ipv4.ip_local_port_range", value: "10000 65535" }
+        - { key: "net.ipv4.udp_rmem_min", value: "8192" }
+        - { key: "net.ipv4.udp_wmem_min", value: "8192" }
+        - { key: "net.ipv4.conf.all.send_redirects", value: "1" } 
+        - { key: "net.ipv4.conf.all.accept_redirects", value: "1" }
+        - { key: "net.ipv4.conf.all.accept_source_route", value: "1"}
+        - { key: "net.ipv4.ip_forward", value: "0" }
+        - { key: "net.ipv4.tcp_slow_start_after_idle", value: "0" }
+        - { key: "net.ipv4.tcp_keepalive_time", value: "60" }
+        - { key: "net.ipv4.tcp_max_tw_buckets", value: "2000000" }
+        - { key: "net.ipv4.tcp_fin_timeout", value: "10" }
+        - { key: "net.ipv4.tcp_tw_reuse", value: "1" }
+        - { key: "net.ipv4.tcp_tw_recycle", value: "1" }
+        - { key: "net.ipv4.tcp_keepalive_intvl", value: "15" }
+        - { key: "net.ipv4.tcp_keepalive_probes", value: "5" }
+        - { key: "net.ipv4.tcp_max_orphans", value: "3276800" }
+        - { key: "net.ipv4.tcp_mem", value: "94500000 915000000927000000" }
+        - { key: "net.ipv4.tcp_syn_retries", value: "2" }
+        - { key: "net.ipv4.tcp_synack_retries", value: "2" }
+        - { key: "net.ipv4.tcp_timestamps", value: "0" }
+        - { key: "net.core.wmem_max", value: "16777216" }
+        - { key: "net.core.rmem_max", value: "16777216" }
+        - { key: "net.core.rmem_default", value: "8388608" }
+        - { key: "net.core.wmem_default", value: "8388608" }</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a><a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookNeiHeCanShuDiaoYou.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="AnsiblePlaybookChuangJianappYongHu" name="Ansible Playbook创建app用户" href="/blog/AnsiblePlaybookChuangJianappYongHu.html">Ansible Playbook创建app用户</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <pre class="language-yaml"><code>---
+# ansible-playbook -l app1 02_PRO_UlimitApp.yml
+# It works with new version openssh. openssh-5.3 has lots of bugs.
+- name: create user and ulimit [0.0.2]
+  hosts: all
+  gather_facts: no
+  vars:
+    uuser: nginx
+
+  tasks:
+    - name: create user
+      shell: useradd {{ uuser }}
+      ignore_errors: true
+
+    - name: passwd lock user
+      shell: passwd -l {{ uuser }}
+      ignore_errors: true
+
+    - name: modify /etc/security/limit.conf
+      pam_limits: domain={{ item.domain }} limit_type={{ item.type }} limit_item={{ item.item }} value={{ item.value }}
+      ignore_errors: True
+      with_items:
+        - { domain: '{{uuser}}', type: 'soft', item: 'nofile', value: '63536' }
+        - { domain: '{{uuser}}', type: 'hard', item: 'nofile', value: '63536' }
+        - { domain: '{{uuser}}', type: 'soft', item: 'nproc', value: '63536' }
+        - { domain: '{{uuser}}', type: 'hard', item: 'nproc', value: '63536' }
+
+    - name: show process
+      shell: ulimit -a
+      become_user: "{{ uuser }}"
+      with_items:
+        - "{{ uuser }}"
+      ignore_errors: True
+      register: ulimitOut
+
+    - debug: msg="ulimit -a ~&gt; {{ ulimitOut }}"</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a><a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookChuangJianappYongHu.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="AnsiblePlaybookAnZhuangJiChuZuJian" name="Ansible Playbook安装基础组件" href="/blog/AnsiblePlaybookAnZhuangJiChuZuJian.html">Ansible Playbook安装基础组件</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <pre class="language-yaml"><code>---
+# ansible-playbook -l app1 base_component.yml
+- name: install base componnet [0.0.1]
+  hosts: all
+  gather_facts: yes
+  vars:
+    update_all: True
+
+  tasks:
+  - name: update system
+    shell: yum makecache ; yum update -y
+    when: (ansible_os_family == "RedHat" and update_all == 'True')
+
+  - name: install base component For RedHat Family
+    package: name={{ item }} update_cache=no state=latest
+    with_items:
+     - net-tools
+     - automake
+     - autoconf
+     - dstat
+     - gcc
+     - gcc-c++
+     - gdb
+     - make
+     - nc
+     - telnet
+     - vim
+     - tree
+     - ntpdate
+     - libselinux-python
+     - chkconfig
+     - sysstat
+     - iptraf
+     - openssl
+     - openssl-devel
+     - fail2ban
+     - smem
+    when: ansible_os_family == "RedHat"
+
+  - service: name=fail2ban state=restarted</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a><a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookAnZhuangJiChuZuJian.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
+        </div>
+    </div>
+
+<!-- pagination.ftl -->
+<div class="d-pagination">
+        <a class="a-pagination next" href="/list/list-1.html">下一页</a>
+</div>
+<!-- footer.ftl -->
+<script>
+var flag = false;
+function showDonation(){
+    if(flag){
+        flag = false;
+        document.getElementsByClassName('d-donation')[0].style.display = 'none';
+    }else{
+        flag = true;
+        document.getElementsByClassName('d-donation')[0].style.display = 'block';
+    }
+}
+</script>
+
+<div class="d-donation">
+    <ul>
+        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
+    </ul>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/lab023/lab023.github.io/issues" >报告错误</a> | <a href="/LICENSE.txt" target="_blank">代码许可</a> | <a href="javascript:void(0);"  onclick="showDonation()">赞助一下</a></p>
+</div>
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130961613-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130961613-1');
+</script>
+</div>
+
+<!-- js.ftl -->
+<script src="/js/prism.js"></script>
+<script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+</body>
+</html>

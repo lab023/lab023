@@ -1,0 +1,188 @@
+<html>
+<head>
+
+    <!-- header.ftl -->
+<title>标签: OpenSSH 第1页 总1页 | Lab 023</title>
+<h1><a href="https://lab023.github.io">Lab 023</a></h1>
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<!-- css.ftl -->
+<link href="/css/default_main.css" type="text/css" rel="stylesheet">
+<link href="/css/prism.css" type="text/css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="main_div">
+
+    <div>
+        <h2><a id="AnsiblePlaybookZiDongPeiZhiSSH" name="Ansible Playbook自动配置SSH" href="/blog/AnsiblePlaybookZiDongPeiZhiSSH.html">Ansible Playbook自动配置SSH</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <pre class="language-yaml"><code>---
+- name: 16_PRO_SSHConfig.yml
+  hosts: all
+  gather_facts: yes
+  vars:
+    allow_root: True
+    allow_password: False
+    ssh_port: 34522
+    ssh_change_port: True
+
+  tasks:
+    - name: Delete GSS
+      lineinfile: dest=/etc/ssh/sshd_config state=absent regexp=".*GSS.*"
+  
+    - name: Set UseDNS no
+      lineinfile: dest=/etc/ssh/sshd_config regexp=".*UseDNS.*" line="UseDNS no"
+
+    - name: if permit root login via publickey
+      lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin " insertafter="^#PermitRootLogin " line="PermitRootLogin without-password" 
+      when: allow_root == 'True'
+
+    - name: if not allow rootlogin
+      lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin " insertafter="^#PermitRootLogin " line="PermitRootLogin no"
+      when: allow_root == 'False'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication yes"
+      when: allow_password == 'True'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication " line="PasswordAuthentication no"
+      when: allow_password == 'False'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp="^RSAAuthentication " line="RSAAuthentication yes"
+      when: allow_password == 'False'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp="^PubkeyAuthentication " line="PubkeyAuthentication yes"
+      when: allow_password == 'False'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp="^AuthorizedKeysFile " line="AuthorizedKeysFile .ssh/authorized_keys"
+      when: allow_password == 'False'
+
+    - lineinfile: dest=/etc/ssh/sshd_config regexp=".*Port.*" line="Port {{ssh_port}}"
+      when: ssh_change_port == 'True'
+
+    - name: restart sshd service
+      service: name=sshd state=restarted</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a><a class="a-tag" href="/tag/tag-8be888738248407aa574057256d807ad-1.html?f=OpenSSH">OpenSSH 2</a><a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookZiDongPeiZhiSSH.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="ZhangQiGengXinOpenSSHClientConfigTips" name="「长期更新」OpenSSH Client Config Tips" href="/blog/ZhangQiGengXinOpenSSHClientConfigTips.html">「长期更新」OpenSSH Client Config Tips</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <p>&nbsp;~/.ssh/config 配置文件详解</p>
+<pre class="language-markup"><code># 全局配置
+Host *
+  # 启用会话重用("持久化连接")功能
+  # 会话重用意味着其他人也能登录你正在连接的服务器, 除非用户隔离
+  ControlMaster auto
+  # 会话存放路径 注意存放路径, 不推荐存放到/tmp目录
+  # 如果链路端开, 会话已经无效, 需要kill掉ssh进程或删掉会话文件
+  ControlPath ~/.ssh/sockets/%r@%h-%p
+  # 会话有效时间 单位分钟
+  ControlPersist 600
+  # 允许转发秘钥到远端服务器, 再次跳转其他服务器不用秘钥
+  ForwardAgent yes
+  # 转发X11协议
+  ForwardX11 no
+  # 转发X11协议到信任服务器
+  ForwardX11Trusted yes
+  # SSH 2.0协议
+  Protocol 2
+  # 发送心跳包间隔 单位秒
+  ServerAliveInterval 60
+  # 服务器断开心跳数量
+  # 也就是"持久化连接"会在网络断开30*60秒之后自动断开
+  ServerAliveCountMax 30
+
+# 远端服务器缩写 直接ssh host1连接
+Host host1
+  # 使用加密算法 需要配合远端sshd_config
+  Ciphers aes256-gcm@openssh.com,chacha20-poly1305@openssh.com
+  # 服务器IP或域名
+  HostName x.x.x.x
+  # 允许转发秘钥到远端服务器, 二次跳转免登陆. 远端使用ssh-add -L查看
+  ForwardAgent yes
+  # 登录的用户名
+  User root
+  # 服务器SSH端口
+  port 56722
+  # 使用跳板机登录 跳板机配置秘钥免登陆
+  ProxyJump 192.168.1.100
+  # 使用跳板机NC登录,比ProxyJump麻烦些
+  ProxyCommand ssh 192.168.1.100 nc %h %p
+  # 映射本地80端口到远端60080端口
+  RemoteForward 127.0.0.1:60080 127.0.0.1:80
+  # 映射远端443端口到本地10443端口
+  LocalForward 127.0.0.1:10443 127.0.0.1:443
+  # 认证秘钥
+  IdentityFile /path/to/your/identify</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-8be888738248407aa574057256d807ad-1.html?f=OpenSSH">OpenSSH 2</a><a class="a-tag" href="/tag/tag-d8d3d6455d28426a88148d3b26cad46d-1.html?f=Linux">Linux 4</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/ZhangQiGengXinOpenSSHClientConfigTips.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-4-15</a></div>
+        </div>
+    </div>
+
+<!-- pagination.ftl -->
+<div class="d-pagination">
+    </div>
+<!-- footer.ftl -->
+<script>
+var flag = false;
+function showDonation(){
+    if(flag){
+        flag = false;
+        document.getElementsByClassName('d-donation')[0].style.display = 'none';
+    }else{
+        flag = true;
+        document.getElementsByClassName('d-donation')[0].style.display = 'block';
+    }
+}
+</script>
+
+<div class="d-donation">
+    <ul>
+        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
+    </ul>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/lab023/lab023.github.io/issues" >报告错误</a> | <a href="/LICENSE.txt" target="_blank">代码许可</a> | <a href="javascript:void(0);"  onclick="showDonation()">赞助一下</a></p>
+</div>
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130961613-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130961613-1');
+</script>
+</div>
+
+<!-- js.ftl -->
+<script src="/js/prism.js"></script>
+<script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+</body>
+</html>

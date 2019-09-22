@@ -1,0 +1,352 @@
+<html>
+<head>
+
+    <!-- header.ftl -->
+<title>Java输出文字表格（更新V2） | Lab 023</title>
+<h1><a href="https://lab023.github.io">Lab 023</a></h1>
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<!-- css.ftl -->
+<link href="/css/default_main.css" type="text/css" rel="stylesheet">
+<link href="/css/prism.css" type="text/css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="main_div">
+
+    <div>
+        <h2><a id="JavaShuChuWenZiBiaoGeGengXinV2" name="Java输出文字表格（更新V2）" href="/blog/JavaShuChuWenZiBiaoGeGengXinV2.html">Java输出文字表格（更新V2）</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+                <pre class="language-java"><code>import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 网格化String输出
+ * &lt;p&gt;
+ * File:        StringGrid
+ * Create:      2018/11/26
+ * Modify:      2018/11/26
+ * Version:     1.0.0
+ * JDK:         8
+ */
+public class StringGrid {
+    private static final int COLUMN_SPACE = 2;
+    private ArrayList&lt;String[]&gt; contentList = new ArrayList&lt;&gt;();
+    private Map&lt;Integer, Integer&gt; widthMap = new HashMap&lt;&gt;();
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        StringGrid grid = new StringGrid();
+        grid.add("1 2 3 4");
+        grid.add("1111 2aaa 3bbb 555sdfdsf");
+        grid.add("春 2aaa 3bbb 555sdfdsf");
+        grid.add(new Object[]{777, 2343242, 121312, "111"});
+        System.out.println(grid.toString());
+    }
+
+    public void add(String str) throws UnsupportedEncodingException {
+        add(str.split(" "));
+    }
+
+    public void add(Object[] args) throws UnsupportedEncodingException {
+        for (int i = 0; i &lt; args.length; i++) {
+            Integer width = widthMap.get(i);
+            if (width == null) width = 0;
+
+            if (args[i].toString().getBytes("GBK").length &gt; width) {
+                widthMap.put(i, args[i].toString().getBytes("GBK").length);
+            }
+        }
+        final String[] strings = new String[args.length];
+        for (int i = 0; i &lt; args.length; i++) {
+            strings[i] = args[i] + "";
+        }
+        contentList.add(strings);
+    }
+
+    public String toString() {
+        String result = "";
+
+        // make result string
+        result += lines() + "\n";
+        for (String[] strings : contentList) {
+            result += "|";
+            for (int i = 0; i &lt; strings.length; i++) {
+                try {
+                    if(widthMap.get(i) &gt; 40)
+                        result += strings[i] + columnPaddingLeft(strings[i], widthMap.get(i)) + columnPaddingRight(strings[i], widthMap.get(i)) + "|";
+                    else
+                        result += columnPaddingLeft(strings[i], widthMap.get(i)) + strings[i] + columnPaddingRight(strings[i], widthMap.get(i)) + "|";
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+            result += "\n" + lines() + "\n";
+        }
+        return result;
+    }
+
+    private String lines() {
+        String s = "+";
+        for (Integer integer : widthMap.values()) {
+            s += padding(integer + COLUMN_SPACE * 2, "-") + "+";
+        }
+        return s;
+    }
+
+    private String columnPaddingLeft(String string, int columnWidth) throws UnsupportedEncodingException {
+        int diff = columnWidth - string.getBytes("GBK").length;
+        // 奇数左边少一个空格
+        if (diff % 2 == 1) diff -= 1;
+        return padding(diff / 2 + COLUMN_SPACE, " ");
+    }
+
+    private String columnPaddingRight(String string, int columnWidth) throws UnsupportedEncodingException {
+        int diff = columnWidth - string.getBytes("GBK").length;
+        // 奇数右边多一个空格
+        if (diff % 2 == 1) diff += 1;
+        return padding(diff / 2 + COLUMN_SPACE, " ");
+    }
+
+    /**
+     * 填充字符
+     *
+     * @param length 长度
+     * @param pad    字符
+     * @return 固定长度的字符
+     */
+    private String padding(int length, String pad) {
+        String s = "";
+        for (int i = 0; i &lt; length; i++) {
+            s += pad;
+        }
+        return s;
+    }
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>V2 新增了单行输出</p>
+<pre class="language-java"><code>import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+public class StringGrid {
+    private static final int                   COLUMN_SPACE     = 2;
+    private static final String                SINGLE_LINE_MARK = "___";
+    private              ArrayList&lt;String[]&gt;   contentList      = new ArrayList&lt;&gt;();
+    private              Map&lt;Integer, Integer&gt; widthMap         = new HashMap&lt;&gt;();
+
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        StringGrid grid = new StringGrid();
+        grid.add("1111 2aaa 3bbb 555sdfdsf");
+        grid.add("春 2aaa 3bbb 555sdfdsf");
+        grid.add(new Object[]{777, 2343242, 121312, "111"});
+        grid.add("___ 1 2 3 4 5 蠢 呵呵呵呵呵呵呵呵呵呵呵呵 h");
+        System.out.println(grid.toString());
+    }
+
+    public void add(String str) throws UnsupportedEncodingException {
+        add(str.split(" "));
+    }
+
+    public void add(Object[] args) throws UnsupportedEncodingException {
+        // 计算宽度
+        if (args.length &gt; 0 &amp;&amp; !args[0].toString().startsWith(SINGLE_LINE_MARK)) {
+            for (int i = 0; i &lt; args.length; i++) {
+                Integer width = widthMap.get(i);
+                if (width == null) width = 0;
+
+                if (args[i].toString().getBytes("GBK").length &gt; width) {
+                    widthMap.put(i, args[i].toString().getBytes("GBK").length);
+                }
+            }
+        }
+        // 分拆字段
+        final String[] strings = new String[args.length];
+        for (int i = 0; i &lt; args.length; i++) {
+            strings[i] = args[i] + "";
+        }
+        contentList.add(strings);
+    }
+
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+
+        // make result string
+        result.append(lines()).append("\n");
+        for (String[] strings : contentList) {
+            result.append("|");
+            // @TODO 有BUG
+            if (strings.length &gt; 0 &amp;&amp; strings[0].startsWith(SINGLE_LINE_MARK)) {
+                // 单行记录
+                StringBuilder lineText = new StringBuilder();
+                for (String string : strings) {
+                    lineText.append(string).append(" ");
+                }
+                String line = lineText.toString().replace(SINGLE_LINE_MARK, "");
+                result.append(line).append(columnPaddingLeft(line, totalWidth() - 4)).append(columnPaddingRight(line, totalWidth() - 4)).append("|");
+            } else
+                for (int i = 0; i &lt; strings.length; i++) {
+                    if (widthMap.get(i) &gt; 40)
+                        result.append(strings[i]).append(columnPaddingLeft(strings[i], widthMap.get(i))).append(columnPaddingRight(strings[i], widthMap.get(i))).append("|");
+                    else
+                        result.append(columnPaddingLeft(strings[i], widthMap.get(i))).append(strings[i]).append(columnPaddingRight(strings[i], widthMap.get(i))).append("|");
+                }
+            result.append("\n").append(lines()).append("\n");
+        }
+        return result.toString();
+    }
+
+    /**
+     * @return 横线
+     */
+    private String lines() {
+        StringBuilder s = new StringBuilder("+");
+        for (Integer integer : widthMap.values()) {
+            s.append(padding(integer + COLUMN_SPACE * 2, "-")).append("+");
+        }
+        return s.toString();
+    }
+
+    /**
+     * @return 总宽度
+     */
+    private int totalWidth() {
+        int length = 0;
+        for (Integer value : widthMap.values()) {
+            length += (value + COLUMN_SPACE * 2 + 1);
+        }
+        return length - 1;
+    }
+
+    private String columnPaddingLeft(String string, int columnWidth) {
+        int diff = 0;
+        try {
+            diff = columnWidth - string.getBytes("GBK").length;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        // 奇数左边少一个空格
+        if (diff % 2 == 1) diff -= 1;
+        return padding(diff / 2 + COLUMN_SPACE, " ");
+    }
+
+    private String columnPaddingRight(String string, int columnWidth) {
+        int diff = 0;
+        try {
+            diff = columnWidth - string.getBytes("GBK").length;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        // 奇数右边多一个空格
+        if (diff % 2 == 1) diff += 1;
+        return padding(diff / 2 + COLUMN_SPACE, " ");
+    }
+
+    /**
+     * 填充字符
+     *
+     * @param length 长度
+     * @param pad    字符
+     * @return 固定长度的字符
+     */
+    private String padding(int length, String pad) {
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i &lt; length; i++) {
+            s.append(pad);
+        }
+        return s.toString();
+    }
+}</code></pre>
+<p>V2输出效果：</p>
+<pre class="language-markup"><code>+--------+-----------+----------+-------------+
+|  1111  |   2aaa    |   3bbb   |  555sdfdsf  |
++--------+-----------+----------+-------------+
+|   春   |   2aaa    |   3bbb   |  555sdfdsf  |
++--------+-----------+----------+-------------+
+|  777   |  2343242  |  121312  |     111     |
++--------+-----------+----------+-------------+
+| 1 2 3 4 5 蠢 呵呵呵呵呵呵呵呵呵呵呵呵 h     |
++--------+-----------+----------+-------------+</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-6cdd2a3f3bfb46cfa2c8b34ffdffcb1e-1.html?f=Java开发">Java开发 6</a> </div>
+            <div class="blog_sign"><a>Roy</a><a>2019-6-30</a></div>
+        </div>
+    </div>
+
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {
+    this.page.url = 'https://lab023.github.io/blog/JavaShuChuWenZiBiaoGeGengXinV2.html';
+    this.page.identifier = 'JavaShuChuWenZiBiaoGeGengXinV2';
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lab023.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<!-- footer.ftl -->
+<script>
+var flag = false;
+function showDonation(){
+    if(flag){
+        flag = false;
+        document.getElementsByClassName('d-donation')[0].style.display = 'none';
+    }else{
+        flag = true;
+        document.getElementsByClassName('d-donation')[0].style.display = 'block';
+    }
+}
+</script>
+
+<div class="d-donation">
+    <ul>
+        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
+    </ul>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/lab023/lab023.github.io/issues" >报告错误</a> | <a href="/LICENSE.txt" target="_blank">代码许可</a> | <a href="javascript:void(0);"  onclick="showDonation()">赞助一下</a></p>
+</div>
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130961613-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130961613-1');
+</script>
+</div>
+
+<!-- js.ftl -->
+<script src="/js/prism.js"></script>
+<script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+</body>
+</html>

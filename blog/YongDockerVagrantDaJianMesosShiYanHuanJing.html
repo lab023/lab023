@@ -1,0 +1,314 @@
+<html>
+<head>
+
+    <!-- header.ftl -->
+<title>用Docker、Vagrant搭建Mesos实验环境 | Lab 023</title>
+<h1><a href="https://lab023.github.io">Lab 023</a></h1>
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<!-- css.ftl -->
+<link href="/css/default_main.css" type="text/css" rel="stylesheet">
+<link href="/css/prism.css" type="text/css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="main_div">
+
+    <div>
+        <h2><a id="YongDockerVagrantDaJianMesosShiYanHuanJing" name="用Docker、Vagrant搭建Mesos实验环境" href="/blog/YongDockerVagrantDaJianMesosShiYanHuanJing.html">用Docker、Vagrant搭建Mesos实验环境</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+                <p><b>1.准备实验环境</b></p>
+<div><br />
+<table style="width: 100%; border-collapse: collapse;" border="1" align="center">
+<tbody>
+<tr>
+<td style="width: 16.6667%;">主机名</td>
+<td style="width: 16.6667%;">IP</td>
+<td style="width: 16.6667%;">内存</td>
+<td style="width: 16.6667%;">CPU核心</td>
+<td style="width: 16.6667%;">角色</td>
+<td style="width: 16.6667%;">Docker镜像</td>
+</tr>
+<tr>
+<td style="width: 16.6667%;">MesosMaster1</td>
+<td style="width: 16.6667%;">172.30.1.101</td>
+<td style="width: 16.6667%;">4G</td>
+<td style="width: 16.6667%;">2</td>
+<td style="width: 16.6667%;">主</td>
+<td style="width: 16.6667%;">
+<p>mesos-master</p>
+<p>zookeeper</p>
+<p>marathon</p>
+</td>
+</tr>
+<tr>
+<td style="width: 16.6667%;">MesosSlave1</td>
+<td style="width: 16.6667%;">172.30.1.111</td>
+<td style="width: 16.6667%;">2G</td>
+<td style="width: 16.6667%;">4</td>
+<td style="width: 16.6667%;">从</td>
+<td style="width: 16.6667%;">&nbsp;mesos-slave</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>vagrant配置</p>
+<pre class="language-ruby"><code># -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    config.vm.box="centos/7"
+    config.ssh.insert_key =  false
+    config.vm.provision "shell", inline: "ifup eth1"
+
+    config.vm.define "MesosMaster1" do |config|
+        config.vm.hostname="MesosMaster1"
+        config.vm.network "private_network", ip: "172.30.1.101"
+        config.vm.provider "virtualbox" do |v|
+            v.memory = 4096
+            v.cpus = 2
+        end
+    end
+
+    config.vm.define "MesosSlave1" do |config|
+        config.vm.hostname="MesosSlave1"
+        config.vm.network "private_network", ip: "172.30.1.111"
+        config.vm.provider "virtualbox" do |v|
+            v.memory = 2048
+            v.cpus = 4
+        end
+    end
+end
+</code></pre>
+<p>&nbsp;</p>
+<p>SSH登录虚拟机</p>
+<pre class="language-bash"><code># 所有节点
+curl -fsSL https://get.docker.com/ | sh &amp;&amp; systemctl start docker &amp;&amp; systemctl status docker
+curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose &amp;&amp; chmod +x /usr/local/bin/docker-compose
+
+# 主节点
+docker pull mesosphere/mesos-master:1.7.1 &amp;&amp; docker pull zookeeper:3.4.14 &amp;&amp; docker pull mesosphere/marathon:v1.9.34
+# 从节点
+docker pull mesosphere/mesos-slave:1.7.1</code></pre>
+<div>
+<div>&nbsp;</div>
+<div><b>2.搭建Mesos&nbsp;+&nbsp;Marathon&nbsp;+&nbsp;Docker</b></div>
+</div>
+<p>主节点下载 <a href="https://github.com/mesosphere/marathon-ui/tree/master/resources" target="_blank" rel="noopener">https://github.com/mesosphere/marathon-ui/tree/master/resources</a>&nbsp;目录到docker-compose.xml目录</p>
+<p>主节点docker-compose.yml</p>
+<pre class="language-yml"><code>version: "2"
+
+services:
+  zookeeper:
+    network_mode: host
+    image: zookeeper:3.4.14
+    hostname: zookeeper
+    restart: always
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+
+  mesos-master:
+    network_mode: host
+    image: mesosphere/mesos-master:1.7.1
+    hostname: mesos-master
+    restart: always
+    container_name: mesos-master
+    entrypoint: [ "mesos-master" ]
+    ports:
+      - "5050:5050"
+    depends_on:
+      - zookeeper
+    environment:
+      - MESOS_CLUSTER=local
+      - MESOS_HOSTNAME=mesos-master.docker
+      - MESOS_LOG_DIR=/var/log
+      - MESOS_QUORUM=1
+      - MESOS_WORK_DIR=/var/lib/mesos
+      - MESOS_ROLES=public
+      - MESOS_ZK=zk://zookeeper:2181/mesos
+      - MESOS_ACLS=file:///mesos-config/acls
+      - MESOS_CREDENTIALS=file:///mesos-config/credentials
+    volumes:
+      - ./resources/mesos-config:/mesos-config
+
+  mesos-slave:
+    image: mesosphere/mesos-slave:1.7.1
+    network_mode: host
+    restart: always
+    entrypoint:
+      - mesos-slave
+    privileged: true
+    hostname: mesos-slave
+    container_name: mesos-slave
+    ports:
+      - "5051:5051"
+    depends_on:
+      - zookeeper
+      - mesos-master
+    environment:
+      - MESOS_SYSTEMD_ENABLE_SUPPORT=false
+      - MESOS_CONTAINERIZERS=docker
+      - MESOS_ISOLATOR=cgroups/cpu, cgroups/mem
+      - MESOS_LOG_DIR=var/log
+      - MESOS_MASTER=zk://zookeeper:2181/mesos
+      - MESOS_PORT=5051
+      - MESOS_WORK_DIR=/var/lib/mesos
+      - MESOS_EXECUTOR_REGISTRATION_TIMEOUT=5mins
+      - MESOS_EXECUTOR_SHUTDOWN_GRACE_PERIOD=90secs
+      - MESOS_DOCKER_STOP_TIMEOUT=60secs
+      - MESOS_RESOURCES=cpus:4;mem:1280;disk:25600;ports(*):[12000-12999]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  marathon:
+    image: mesosphere/marathon:v1.9.34
+    network_mode: host
+    restart: always
+    hostname: marathon
+    container_name: marathon
+    ports:
+      - "8080:8080"
+    depends_on:
+      - zookeeper
+      - mesos-master
+    environment:
+      - MARATHON_ZK=zk://zookeeper:2181/marathon
+      - MARATHON_MASTER=zk://zookeeper:2181/mesos
+      - MARATHON_DECLINE_OFFER_DURATION=3600000
+      - MARATHON_PLUGIN_DIR=/plugins
+      - MARATHON_PLUGIN_CONF=/plugin-conf.json
+      - MARATHON_MESOS_AUTHENTICATION_PRINCIPAL=marathon
+      - MARATHON_MESOS_AUTHENTICATION_SECRET_FILE=/marathon.secret
+      - MARATHON_MESOS_ROLE=public
+    volumes:
+      - ./resources/marathon-plugins:/plugins
+      - ./resources/marathon.plugin-conf.json:/plugin-conf.json
+      - ./resources/marathon.secret:/marathon.secret
+</code></pre>
+<p>从节点docker-compose.yml</p>
+<pre class="language-yml"><code>version: "2"
+
+services:
+  mesos-slave:
+    image: mesosphere/mesos-slave:1.7.1
+    network_mode: host
+    restart: always
+    entrypoint:
+      - mesos-slave
+    privileged: true
+    hostname: mesos-slave1
+    container_name: mesos-slave
+    ports:
+      - "5051:5051"
+    environment:
+      - MESOS_SYSTEMD_ENABLE_SUPPORT=false
+      - MESOS_CONTAINERIZERS=docker
+      - MESOS_ISOLATOR=cgroups/cpu, cgroups/mem
+      - MESOS_LOG_DIR=var/log
+      - MESOS_MASTER=172.30.1.101:5050
+      - MESOS_IP=172.30.1.111
+      - MESOS_PORT=5051
+      - MESOS_WORK_DIR=/var/lib/mesos
+      - MESOS_EXECUTOR_REGISTRATION_TIMEOUT=5mins
+      - MESOS_EXECUTOR_SHUTDOWN_GRACE_PERIOD=90secs
+      - MESOS_DOCKER_STOP_TIMEOUT=60secs
+      - MESOS_RESOURCES=cpus:4;mem:1280;disk:25600;ports(*):[12000-12999]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+</code></pre>
+<p>&nbsp;</p>
+<div>
+<div><b>3.创建无状态服务</b></div>
+</div>
+<p>浏览器打开 <a href="http://172.30.1.101:8080/ui/#/apps" target="_blank" rel="noopener">http://172.30.1.101:8080/ui/#/apps</a></p>
+<div>随便创建一个应用，可以观察从节点行为（应用经常重启，好像是docker状态丢失）.</div>
+<div>&nbsp;</div>
+<div>
+<div><b>4.总结</b></div>
+<div>因为是实验环境，有一些报错也就不深入研究了，毕竟学了就忘，用了才能记住<img src="static/tinymce4.7.5/plugins/emoticons/img/smiley-cool.gif" alt="cool" /></div>
+</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-00f2de205f3e4737bfb1fa2574bdb6a5-1.html?f=学习">学习 1</a> <a class="a-tag" href="/tag/tag-43f6dca0eaf040ae9c527bc0a9dad327-1.html?f=Mesos">Mesos 1</a></div>
+            <div class="blog_sign"><a>Roy</a><a>2019-9-21</a></div>
+        </div>
+    </div>
+
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {
+    this.page.url = 'https://lab023.github.io/blog/YongDockerVagrantDaJianMesosShiYanHuanJing.html';
+    this.page.identifier = 'YongDockerVagrantDaJianMesosShiYanHuanJing';
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lab023.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<!-- footer.ftl -->
+<script>
+var flag = false;
+function showDonation(){
+    if(flag){
+        flag = false;
+        document.getElementsByClassName('d-donation')[0].style.display = 'none';
+    }else{
+        flag = true;
+        document.getElementsByClassName('d-donation')[0].style.display = 'block';
+    }
+}
+</script>
+
+<div class="d-donation">
+    <ul>
+        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
+    </ul>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/lab023/lab023.github.io/issues" >报告错误</a> | <a href="/LICENSE.txt" target="_blank">代码许可</a> | <a href="javascript:void(0);"  onclick="showDonation()">赞助一下</a></p>
+</div>
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130961613-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130961613-1');
+</script>
+</div>
+
+<!-- js.ftl -->
+<script src="/js/prism.js"></script>
+<script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+</body>
+</html>

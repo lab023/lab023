@@ -1,0 +1,251 @@
+<html>
+<head>
+
+    <!-- header.ftl -->
+<title>Qualys SSL Labs满分Nginx配置 | Lab 023</title>
+<h1><a href="https://lab023.github.io">Lab 023</a></h1>
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<!-- css.ftl -->
+<link href="/css/default_main.css" type="text/css" rel="stylesheet">
+<link href="/css/prism.css" type="text/css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="main_div">
+
+    <div>
+        <h2><a id="QualysSSLLabsManFenNginxPeiZhi" name="Qualys SSL Labs满分Nginx配置" href="/blog/QualysSSLLabsManFenNginxPeiZhi.html">Qualys SSL Labs满分Nginx配置</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+                <pre class="language-nginx"><code>user nginx;
+worker_processes 8;
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+events {
+    worker_connections   1024;
+    use epoll;
+    multi_accept on;
+}
+
+http {
+    include                     mime.types;
+
+    keepalive_timeout           65;
+    keepalive_requests          10000;
+    sendfile                    on;
+    tcp_nopush                  on;
+    tcp_nodelay                 on;
+    server_tokens               off;
+
+    client_header_buffer_size   1k;
+    large_client_header_buffers 4 4k;
+    output_buffers              1 32k;
+    postpone_output             1460;
+
+    client_header_timeout       3m;
+    client_body_timeout         3m;
+    send_timeout                3m;
+
+    open_file_cache max=1000 inactive=20s;
+    open_file_cache_valid 30s;
+    open_file_cache_min_uses 5;
+    open_file_cache_errors off;
+
+    gzip on;
+    gzip_min_length  1000;
+    gzip_buffers     4 4k;
+    gzip_types       application/x-javascript text/css application/javascript text/javascript text/plain text/xml application/json application/vnd.ms-fontobject application/x-font-opentype application/x-font-truetype application/x-font-ttf application/xml font/eot font/opentype font/otf image/svg+xml image/vnd.microsoft.icon;
+    gzip_disable "MSIE [1-6]\.";
+
+    log_format main      '$remote_addr - $remote_user [$time_local]  '
+      '"$request" $status $bytes_sent '
+      '"$http_referer" "$http_user_agent" '
+      '"$gzip_ratio"';
+
+    log_format download  '$remote_addr - $remote_user [$time_local]  '
+      '"$request" $status $bytes_sent '
+      '"$http_referer" "$http_user_agent" '
+      '"$http_range" "$sent_http_content_range"';
+
+    ########################################
+    # Reverse Proxy Config
+    ########################################
+    proxy_redirect          off;
+    proxy_set_header        Host                $host;
+    proxy_set_header        X-Real-IP           $remote_addr;
+    proxy_set_header        X-Forwarded-Proto   $scheme;
+    proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+    client_max_body_size    10m;
+    client_body_buffer_size 128k;
+    proxy_connect_timeout   180;
+    proxy_send_timeout      180;
+    proxy_read_timeout      180;
+    proxy_buffers           32 4k;
+
+    server
+    {
+        listen          80;
+        listen          443 ssl http2 default_server;
+        server_name     023sec.com;
+        underscores_in_headers      on;
+        server_name_in_redirect     off;
+        error_page 404 = /404.html;
+        ########################################
+        # Security Config
+        ########################################
+        resolver 223.5.5.5;
+        add_header X-Frame-Options "DENY";
+        add_header X-XSS-Protection "1; mode=block";
+        add_header X-Content-Type-Options nosniff;
+        add_header Public-Key-Pins 'pin-sha256="YLh1dUR9y6Kja30RrAn7JKnbQG/uEtLMkBgFF2Fuihg="; pin-sha256="aef6IF2UF6jNEwA2pNmP7kpgT6NFSdt7Tqf5HzaIGWI="; max-age=5184000; includeSubDomains; report-uri="https://***.com/noHPKP"' always;
+        add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload" always;
+
+        ########################################
+        # SSL Config
+        ########################################
+        ssl_session_cache               shared:SSL:10m;
+        ssl_session_timeout             10m;
+        ssl_session_tickets             off;
+        ssl_certificate                 /etc/letsencrypt/live/***.com/fullchain.pem;
+        ssl_certificate_key             /etc/letsencrypt/live/***.com/privkey.pem;
+        ssl_dhparam                     /etc/letsencrypt/live/***.com/dhparams.pem.4096;
+        ssl_ecdh_curve                  secp384r1:secp521r1;
+        ssl_verify_client               off;
+        ssl_protocols                   TLSv1.2;
+        ssl_ciphers                     'CHACHA20:ECDH+AES256:DHE+AES256:!aNULL:!MD5:!DSS';
+
+        ssl_prefer_server_ciphers       on;
+        ssl_stapling                    on;
+        ssl_stapling_verify             on;
+
+        ########################################
+        # Force https
+        ########################################
+        if ($scheme = http) {
+            return 301 https://***.com$request_uri;
+        }
+
+        ########################################
+        # Reverse Proxy config
+        ########################################
+        proxy_redirect          off;
+        proxy_set_header        Host                $host;
+        proxy_set_header        X-Real-IP           $remote_addr;
+        proxy_set_header        X-Forwarded-Proto   $scheme;
+        proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+        proxy_set_header        Cookie              $http_cookie;
+        client_max_body_size    64m;
+        client_body_buffer_size 128k;
+        proxy_connect_timeout   180;
+        proxy_send_timeout      180;
+        proxy_read_timeout      180;
+        proxy_buffers           32 4k;
+
+        location / {
+            access_log      /var/log/nginx/access.log;
+            error_log       /var/log/nginx/error.log warn;
+            proxy_pass      http://localhost:48080;
+            index           index.html index.htm index.jsp;
+        }
+
+        location /nginx_status
+        {
+           stub_status on;
+           access_log off;
+           allow 127.0.0.1;
+           deny all;
+        }
+
+        location /api/ {
+            proxy_pass      http://127.0.0.1:10001;
+            index           index.html index.htm index.jsp;
+        }
+
+        error_page   500 502 503 504 /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+}
+</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-d8d3d6455d28426a88148d3b26cad46d-1.html?f=Linux">Linux 4</a><a class="a-tag" href="/tag/tag-c20b4b5f29f644baba84ccad6dbb5017-1.html?f=Nginx">Nginx 3</a></div>
+            <div class="blog_sign"><a>Roy</a><a>2019-5-8</a></div>
+        </div>
+    </div>
+
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {
+    this.page.url = 'https://lab023.github.io/blog/QualysSSLLabsManFenNginxPeiZhi.html';
+    this.page.identifier = 'QualysSSLLabsManFenNginxPeiZhi';
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lab023.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<!-- footer.ftl -->
+<script>
+var flag = false;
+function showDonation(){
+    if(flag){
+        flag = false;
+        document.getElementsByClassName('d-donation')[0].style.display = 'none';
+    }else{
+        flag = true;
+        document.getElementsByClassName('d-donation')[0].style.display = 'block';
+    }
+}
+</script>
+
+<div class="d-donation">
+    <ul>
+        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
+    </ul>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/lab023/lab023.github.io/issues" >报告错误</a> | <a href="/LICENSE.txt" target="_blank">代码许可</a> | <a href="javascript:void(0);"  onclick="showDonation()">赞助一下</a></p>
+</div>
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130961613-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130961613-1');
+</script>
+</div>
+
+<!-- js.ftl -->
+<script src="/js/prism.js"></script>
+<script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+</body>
+</html>

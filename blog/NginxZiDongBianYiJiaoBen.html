@@ -1,0 +1,168 @@
+<html>
+<head>
+
+    <!-- header.ftl -->
+<title>Nginx自动编译脚本 | Lab 023</title>
+<h1><a href="https://lab023.github.io">Lab 023</a></h1>
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<!-- css.ftl -->
+<link href="/css/default_main.css" type="text/css" rel="stylesheet">
+<link href="/css/prism.css" type="text/css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="main_div">
+
+    <div>
+        <h2><a id="NginxZiDongBianYiJiaoBen" name="Nginx自动编译脚本" href="/blog/NginxZiDongBianYiJiaoBen.html">Nginx自动编译脚本</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+                <pre class="language-bash"><code>#!/usr/bin/env bash
+#
+# 编译成功的前提是openssl能正确编译
+# test on centos7@2018-06-29
+#
+
+export BUILD_DIR=/tmp/nginx-static-openssl/build
+export VERSION_NGINX=nginx-1.14.0
+export VERSION_OPENSSL=openssl-1.1.1-pre8
+export SOURCE_NGINX=http://nginx.org/download/
+export SOURCE_OPENSSL=https://www.openssl.org/source/
+
+function setup() {
+    rm -rf ${BUILD_DIR}
+    mkdir -p ${BUILD_DIR}
+    if [ -n "$(command -v yum)" ]; then yum -y groupinstall "Development Tools" &amp;&amp; yum -y install libaio-devel libaio perl-CGI cpan perl-Module-Load-Conditional perl-core; fi
+    if [ -n "$(command -v apt-get)" ]; then apt-get install build-essential; fi
+}
+
+function download_sources() {
+    echo "Download sources"
+
+    pushd ${BUILD_DIR}
+
+    curl --remote-name "${SOURCE_NGINX}${VERSION_NGINX}.tar.gz"
+    curl --remote-name "${SOURCE_OPENSSL}${VERSION_OPENSSL}.tar.gz"
+    popd
+}
+
+function extract_sources() {
+    echo "Extracting sources"
+
+    pushd ${BUILD_DIR}
+
+    tar -xf "${VERSION_NGINX}.tar.gz"
+    tar -xf "${VERSION_OPENSSL}.tar.gz"
+    popd
+}
+
+function compile_nginx() {
+    echo "Configure &amp; Build nginx"
+
+    pushd "${BUILD_DIR}/${VERSION_NGINX}"
+
+    make clean
+
+    ./configure \
+    --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib64/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-cc-opt='-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic -fPIC' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -pie' --with-openssl-opt=enable-tls1_3 --with-openssl=${BUILD_DIR}/${VERSION_OPENSSL}
+
+    make -j1
+
+    popd
+}
+
+echo "Building ${VERSION_NGINX} with static ${VERSION_OPENSSL}"
+
+setup &amp;&amp; download_sources &amp;&amp; extract_sources &amp;&amp; compile_nginx
+
+retval=$?
+echo ""
+if [ $retval -eq 0 ]; then
+    echo "Your nginx binary is located at ${BUILD_DIR}/${VERSION_NGINX}/objs/nginx"
+    echo "Listing dynamically linked libraries ..."
+    ldd ${BUILD_DIR}/${VERSION_NGINX}/objs/nginx
+    echo ""
+    ${BUILD_DIR}/${VERSION_NGINX}/objs/nginx -V
+else
+    echo "Ooops, build failed. Check output!"
+fi</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-c20b4b5f29f644baba84ccad6dbb5017-1.html?f=Nginx">Nginx 3</a><a class="a-tag" href="/tag/tag-d8d3d6455d28426a88148d3b26cad46d-1.html?f=Linux">Linux 4</a></div>
+            <div class="blog_sign"><a>Roy</a><a>2019-5-8</a></div>
+        </div>
+    </div>
+
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {
+    this.page.url = 'https://lab023.github.io/blog/NginxZiDongBianYiJiaoBen.html';
+    this.page.identifier = 'NginxZiDongBianYiJiaoBen';
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lab023.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<!-- footer.ftl -->
+<script>
+var flag = false;
+function showDonation(){
+    if(flag){
+        flag = false;
+        document.getElementsByClassName('d-donation')[0].style.display = 'none';
+    }else{
+        flag = true;
+        document.getElementsByClassName('d-donation')[0].style.display = 'block';
+    }
+}
+</script>
+
+<div class="d-donation">
+    <ul>
+        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
+    </ul>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/lab023/lab023.github.io/issues" >报告错误</a> | <a href="/LICENSE.txt" target="_blank">代码许可</a> | <a href="javascript:void(0);"  onclick="showDonation()">赞助一下</a></p>
+</div>
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130961613-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130961613-1');
+</script>
+</div>
+
+<!-- js.ftl -->
+<script src="/js/prism.js"></script>
+<script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+</body>
+</html>

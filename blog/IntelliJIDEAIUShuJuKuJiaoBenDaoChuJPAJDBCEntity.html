@@ -1,0 +1,433 @@
+<html>
+<head>
+
+    <!-- header.ftl -->
+<title>IntelliJ IDEA IU数据库脚本: 导出JPA+JDBC Entity | Lab 023</title>
+<h1><a href="https://lab023.github.io">Lab 023</a></h1>
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<!-- css.ftl -->
+<link href="/css/default_main.css" type="text/css" rel="stylesheet">
+<link href="/css/prism.css" type="text/css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="main_div">
+
+    <div>
+        <h2><a id="IntelliJIDEAIUShuJuKuJiaoBenDaoChuJPAJDBCEntity" name="IntelliJ IDEA IU数据库脚本: 导出JPA+JDBC Entity" href="/blog/IntelliJIDEAIUShuJuKuJiaoBenDaoChuJPAJDBCEntity.html">IntelliJ IDEA IU数据库脚本: 导出JPA+JDBC Entity</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+                <p>使用方法: Database -&gt; 右键数据库表 -&gt; Scripted Extensions -&gt; spring-data-jpa-jdbc.groovy</p>
+<pre class="language-groovy"><code>import com.intellij.database.model.DasTable
+import com.intellij.database.model.ObjectKind
+import com.intellij.database.util.Case
+import com.intellij.database.util.DasUtil
+
+/*
+ * Available context bindings:
+ *   SELECTION   Iterable&lt;DasObject&gt;
+ *   PROJECT     project
+ *   FILES       files helper
+ *
+ * Last Modify: 2018-08-13
+ */
+
+packageName = "io.github.lab023.poorcms.entity;"
+typeMapping = [
+        (~/(?i)int/)                      : "Long",
+        (~/(?i)float|double|decimal|real/): "Double",
+        (~/(?i)datetime|ts/)              : "Timestamp",
+        (~/(?i)date/)                     : "Date",
+        (~/(?i)time/)                     : "Timestamp",
+        (~/(?i)/)                         : "String"
+]
+
+FILES.chooseDirectoryAndSave("Choose directory", "Choose where to store generated files") { dir -&gt;
+    SELECTION.filter { it instanceof DasTable &amp;&amp; it.getKind() == ObjectKind.TABLE }.each { generate(it, dir) }
+}
+
+def generate(table, dir) {
+    def className = javaName(table.getName(), true)
+    def fields = calcFields(table)
+    new File(dir, className + ".java").withPrintWriter { out -&gt; generate(table, out, className, fields) }
+}
+
+def generate(table, out, className, fields) {
+    out.println "package $packageName"
+    out.println ""
+    out.println "import com.fasterxml.jackson.annotation.JsonFormat;"
+    out.println "import com.fasterxml.jackson.annotation.JsonIgnoreProperties;"
+    out.println "import com.fasterxml.jackson.annotation.JsonProperty;"
+    out.println "import lombok.AllArgsConstructor;"
+    out.println "import lombok.Data;"
+    out.println "import lombok.EqualsAndHashCode;"
+    out.println "import lombok.NoArgsConstructor;"
+    out.println "import lombok.ToString;"
+    out.println "import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;"
+    out.println ""
+    out.println "import javax.persistence.Column;"
+    out.println "import javax.persistence.Entity;"
+    out.println "import javax.persistence.Id;"
+    out.println "import javax.persistence.Table;"
+    out.println "import javax.persistence.GeneratedValue;"
+    out.println "import javax.persistence.GenerationType;"
+    out.println ""
+    out.println "import java.io.Serializable;"
+    out.println "import java.sql.Timestamp;"
+    out.println "import java.sql.Date;"
+    out.println "import java.sql.Time;"
+    out.println ""
+    out.println "@Data"
+    out.println "@Entity"
+    out.println "@Table(name = \"${table.getName()}\")"
+    out.println "@ToString"
+    out.println "@JsonIgnoreProperties(value = {\"insertStm\", \"insertStmDynamic\", \"tableName\"}, ignoreUnknown = true)"
+    out.println "@AllArgsConstructor"
+    out.println "@NoArgsConstructor"
+    out.println "public class $className implements Serializable {"
+    out.println "    public static final String tableName = \"${table.getName()}\";"
+    out.println "    private static final long serialVersionUID = 1L;"
+    out.println ""
+    fields.each() {
+        if (it.annos != "") out.println "  ${it.annos}"
+        if (it.type == "Timestamp") out.println "    @JsonFormat(locale = \"zh\", timezone = \"GMT+8\", pattern = \"yyyy-MM-dd HH:mm:ss\")"
+        if (it.type == "Date") out.println "    @JsonFormat(locale = \"zh\", timezone = \"GMT+8\", pattern = \"yyyy-MM-dd\")"
+        out.println "    @JsonProperty(\"${toCamelCase(it.name)}\")"
+        out.println "    @Column(name = \"${it.name}\")"
+        out.println "    private ${it.type} ${toCamelCase(it.name)};"
+    }
+//    out.println ""
+//    out.println construct(className, fields)
+    out.println "}"
+}
+
+// 字段内容
+def calcFields(table) {
+    DasUtil.getColumns(table).reduce([]) { fields = [{}], col -&gt;
+        def spec = Case.LOWER.apply(col.getDataType().getSpecification())
+        def typeStr = typeMapping.find { p, t -&gt; p.matcher(spec).find() }.value
+        def colName = col.getName() + ""
+
+        // PK字段的开头必须是 idt_
+        if (colName ==~ /(^idt$|^id$|^idt_.*)/) {
+            fields += [[
+                               name : colName,
+                               type : typeStr,
+                               annos: "  @Id" + (typeStr == "Long" ? "\n    @GeneratedValue(strategy = GenerationType.IDENTITY)" : "")]]
+        } else {
+            fields += [[
+                               name : colName,
+                               type : typeStr,
+                               annos: ""]]
+        }
+    }
+}
+
+// 表名转类名
+def javaName(str, capitalize) {
+    def s = str.split(/[^\p{Alnum}]/).collect { def s = Case.LOWER.apply(it).capitalize() }.join("")
+    capitalize ? s : Case.LOWER.apply(s[0]) + s[1..-1]
+}
+
+// 不含主键的构造函数
+def construct(className, fields) {
+    def inputArgs = ""
+    def thisArgs = ""
+    fields.each() {
+        if (it.annos == "") {
+            inputArgs += "${it.type} ${toCamelCase(it.name)}, "
+            thisArgs += "        this.${toCamelCase(it.name)} = ${toCamelCase(it.name)};\n"
+        }
+    }
+    inputArgs = inputArgs.replaceAll('[,][ ]$', '')
+    def ret = ""
+
+    ret += "    public ${className}(${inputArgs}){\n"
+    ret += thisArgs
+    ret += "    }"
+    return ret
+}
+
+// 驼峰命令
+static String toCamelCase(String text, boolean capitalized = false) {
+    text = text.replaceAll("(_)([A-Za-z0-9])", { Object[] it -&gt; it[2].toUpperCase() })
+    return capitalized ? capitalize(text) : text
+}
+
+// 蛇形命名
+static String toSnakeCase(String text) {
+    text.replaceAll(/([A-Z])/, /_$1/).toLowerCase().replaceAll(/^_/, '')
+}
+
+/* Jdbc以下 */
+
+// 首字母大写
+def firstUpper(str) {
+    Case.UPPER.apply(str[0]) + str[1..-1]
+}
+
+// JDBC 默认insert 语句、方法
+def insertStm(table, out, fields) {
+    sql = "INSERT INTO `${table.getName()}` ("
+    fields.each() {
+        sql += "`${it.name}`,"
+    }
+    sql = sql.replaceAll(',$', '')
+    sql += ") VALUES("
+    fields.each() {
+        sql += "?,"
+    }
+    sql = sql.replaceAll(',$', "")
+    sql += ")"
+
+    out.println "    private static final String insertStm = \"${sql}\";"
+    out.println ""
+    out.println "    public static String getInsertStm() {"
+    out.println "        return insertStm;"
+    out.println "    }"
+}
+
+// JDBC 默认insert 语句、方法
+def insertStmDynamic(table, out, fields) {
+    sql = "INSERT INTO `{table_name}` ("
+    fields.each() {
+        sql += "`${it.name}`,"
+    }
+    sql = sql.replaceAll(',$', '')
+    sql += ") VALUES("
+    fields.each() {
+        sql += "?,"
+    }
+    sql = sql.replaceAll(',$', "")
+    sql += ")"
+
+    out.println "    private static final String insertStmDynamic = \"${sql}\";"
+    out.println ""
+    out.println "    public static String getInsertStmDynamic(String tableName) {"
+    out.println "        return insertStmDynamic.replace(\"{table_name}\", tableName);"
+    out.println "    }"
+}
+
+// JDBC PS 方法
+/**
+ * get ParameterizedPreparedStatementSetter
+ * require jdk8
+ *
+ * @param out
+ * @param fields
+ */
+def getPs(className, out, fields) {
+    out.println "    public static ParameterizedPreparedStatementSetter&lt;${className}&gt; getPs() {"
+    out.println "        return (ps, t) -&gt; {"
+    i = 1
+    fields.each() {
+        upperName = firstUpper(toCamelCase(it.name))
+        // 处理Long = null
+        if (it.type == "Long") {
+            out.println "            ps.set${it.type}(${i}, t.get${upperName}() == null ? 0L : t.get${upperName}());"
+        }
+        // 处理Double = null
+        else if (it.type == "Double") {
+            out.println "            ps.set${it.type}(${i}, t.get${upperName}() == null ? 0d : t.get${upperName}());"
+        } else {
+            out.println "            ps.set${it.type}(${i}, t.get${upperName}());"
+        }
+        i++
+    }
+    out.println "        };"
+    out.println "    }"
+}
+
+/* JS对象 */
+def getJsObject(out, fields) {
+    out.println("")
+    out.println("/*")
+    out.println("")
+    out.println("// JS Object")
+
+    fs = ""
+    fs += "export function keyObject() {\n"
+    fs += "  return {\n"
+    fields.each() {
+        fs += "        ${toCamelCase(it.name)}: '',\n"
+    }
+    fs = fs.replaceAll(',\\n$', "")
+    fs += "\n  }\n"
+    fs += "}\n"
+    out.println(fs)
+}
+
+/* JS数组 */
+def getJsArray(out, fields){
+    out.println("// JS array")
+
+    fs = ""
+    fs += "export function keyArray() {\n"
+    fs += "  return ["
+    fields.each() {
+        fs += "'${toCamelCase(it.name)}', "
+    }
+    fs = fs.replaceAll(', $', "")
+    fs += "  ]\n"
+    fs += "}\n"
+    out.println(fs)
+}
+
+/* JS复杂对象 */
+// { display_name: '序号', key: 'idt', canSearch: true, canSort: true, showInExtend: true, type: 'String', cantNull: true }
+def getJsEntity(out, fields) {
+    out.println("// JS Entity")
+
+    fs = ""
+    fs += "export function entity() {\n"
+    fs += "  return [\n"
+    fields.each() {
+        fs += "    { display_name: '_', key: '${toCamelCase(it.name)}', canSearch: ${it.type != "Timestamp"}, canSort: true, showInExtend: ${it.type == "Timestamp"}, type: '${it.type}', canNull: true }, \n"
+    }
+    fs = fs.replaceAll(',\\n$', "")
+    fs += "  ]\n"
+    fs += "}\n"
+    out.println(fs)
+    out.println("*/")
+}</code></pre>
+<p>&nbsp;</p>
+<p>导出示例</p>
+<pre class="language-java"><code>package io.github.lab023.poorcms.entity;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.jdbc.core.ParameterizedPreparedStatementSetter;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.sql.Date;
+import java.sql.Time;
+
+@Data
+@Entity
+@Table(name = "t_cms_type")
+@ToString
+@JsonIgnoreProperties(value = {"insertStm", "insertStmDynamic", "tableName"}, ignoreUnknown = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class TCmsType implements Serializable {
+    public static final String tableName = "t_cms_type";
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @JsonProperty("idt")
+    @Column(name = "idt")
+    private String idt;
+    @JsonProperty("type")
+    @Column(name = "type")
+    private String type;
+    @JsonProperty("linkCount")
+    @Column(name = "link_count")
+    private Long linkCount;
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonProperty("addTime")
+    @Column(name = "add_time")
+    private Timestamp addTime;
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonProperty("updateTime")
+    @Column(name = "update_time")
+    private Timestamp updateTime;
+    @JsonProperty("visible")
+    @Column(name = "visible")
+    private Long visible;
+}
+</code></pre>
+<p>&nbsp;</p>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-6cdd2a3f3bfb46cfa2c8b34ffdffcb1e-1.html?f=Java开发">Java开发 6</a> <a class="a-tag" href="/tag/tag-739faf8831284b65870dcdafac237a49-1.html?f=JPA/JDBC">JPA/JDBC 2</a><a class="a-tag" href="/tag/tag-75ce94fedc024798b7cb5c9b90989b6e-1.html?f=Spring">Spring 2</a></div>
+            <div class="blog_sign"><a>Roy</a><a>2019-5-3</a></div>
+        </div>
+    </div>
+
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {
+    this.page.url = 'https://lab023.github.io/blog/IntelliJIDEAIUShuJuKuJiaoBenDaoChuJPAJDBCEntity.html';
+    this.page.identifier = 'IntelliJIDEAIUShuJuKuJiaoBenDaoChuJPAJDBCEntity';
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lab023.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<!-- footer.ftl -->
+<script>
+var flag = false;
+function showDonation(){
+    if(flag){
+        flag = false;
+        document.getElementsByClassName('d-donation')[0].style.display = 'none';
+    }else{
+        flag = true;
+        document.getElementsByClassName('d-donation')[0].style.display = 'block';
+    }
+}
+</script>
+
+<div class="d-donation">
+    <ul>
+        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
+    </ul>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/lab023/lab023.github.io/issues" >报告错误</a> | <a href="/LICENSE.txt" target="_blank">代码许可</a> | <a href="javascript:void(0);"  onclick="showDonation()">赞助一下</a></p>
+</div>
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130961613-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130961613-1');
+</script>
+</div>
+
+<!-- js.ftl -->
+<script src="/js/prism.js"></script>
+<script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+</body>
+</html>
