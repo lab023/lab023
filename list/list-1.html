@@ -31,6 +31,55 @@
 <div class="main_div">
 
     <div>
+        <h2><a id="AnsiblePlaybookAnZhuangJiChuZuJian" name="Ansible Playbook安装基础组件" href="/blog/AnsiblePlaybookAnZhuangJiChuZuJian.html">Ansible Playbook安装基础组件</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <pre class="language-yaml"><code>---
+# ansible-playbook -l app1 base_component.yml
+- name: install base componnet [0.0.1]
+  hosts: all
+  gather_facts: yes
+  vars:
+    update_all: True
+
+  tasks:
+  - name: update system
+    shell: yum makecache ; yum update -y
+    when: (ansible_os_family == "RedHat" and update_all == 'True')
+
+  - name: install base component For RedHat Family
+    package: name={{ item }} update_cache=no state=latest
+    with_items:
+     - net-tools
+     - automake
+     - autoconf
+     - dstat
+     - gcc
+     - gcc-c++
+     - gdb
+     - make
+     - nc
+     - telnet
+     - vim
+     - tree
+     - ntpdate
+     - libselinux-python
+     - chkconfig
+     - sysstat
+     - iptraf
+     - openssl
+     - openssl-devel
+     - fail2ban
+     - smem
+    when: ansible_os_family == "RedHat"
+
+  - service: name=fail2ban state=restarted</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a><a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookAnZhuangJiChuZuJian.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
+        </div>
+    </div>
+    <div>
         <h2><a id="NginxZiDongBianYiJiaoBen" name="Nginx自动编译脚本" href="/blog/NginxZiDongBianYiJiaoBen.html">Nginx自动编译脚本</a></h2>
         <div class="blog_unit">
             <div class="blog_content">

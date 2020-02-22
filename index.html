@@ -31,6 +31,16 @@
 <div class="main_div">
 
     <div>
+        <h2><a id="PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi" name="PM2集群环境使用log4js打印日志" href="/blog/PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi.html">PM2集群环境使用log4js打印日志</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <p>pm2的日志性能很好，但log4js写起来更爽，用Node做开发追求的不就是敏捷开发么？</p>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-d8757dce543f45eb8a40aeeaa5949d81-1.html?f=Node开发">Node开发 1</a> </div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi.html#disqus_thread">0 讨论</a><a>Roy</a><a>2020-2-22</a></div>
+        </div>
+    </div>
+    <div>
         <h2><a id="YongDockerVagrantDaJianMesosShiYanHuanJing" name="用Docker、Vagrant搭建Mesos实验环境" href="/blog/YongDockerVagrantDaJianMesosShiYanHuanJing.html">用Docker、Vagrant搭建Mesos实验环境</a></h2>
         <div class="blog_unit">
             <div class="blog_content">
@@ -316,55 +326,6 @@ Vue.use(MyPlugin)</code></pre>
             </div>
             <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a><a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a></div>
             <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookChuangJianappYongHu.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
-        </div>
-    </div>
-    <div>
-        <h2><a id="AnsiblePlaybookAnZhuangJiChuZuJian" name="Ansible Playbook安装基础组件" href="/blog/AnsiblePlaybookAnZhuangJiChuZuJian.html">Ansible Playbook安装基础组件</a></h2>
-        <div class="blog_unit">
-            <div class="blog_content">
-            <pre class="language-yaml"><code>---
-# ansible-playbook -l app1 base_component.yml
-- name: install base componnet [0.0.1]
-  hosts: all
-  gather_facts: yes
-  vars:
-    update_all: True
-
-  tasks:
-  - name: update system
-    shell: yum makecache ; yum update -y
-    when: (ansible_os_family == "RedHat" and update_all == 'True')
-
-  - name: install base component For RedHat Family
-    package: name={{ item }} update_cache=no state=latest
-    with_items:
-     - net-tools
-     - automake
-     - autoconf
-     - dstat
-     - gcc
-     - gcc-c++
-     - gdb
-     - make
-     - nc
-     - telnet
-     - vim
-     - tree
-     - ntpdate
-     - libselinux-python
-     - chkconfig
-     - sysstat
-     - iptraf
-     - openssl
-     - openssl-devel
-     - fail2ban
-     - smem
-    when: ansible_os_family == "RedHat"
-
-  - service: name=fail2ban state=restarted</code></pre>
-            </div>
-            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a><a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a></div>
-            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookAnZhuangJiChuZuJian.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
         </div>
     </div>
 

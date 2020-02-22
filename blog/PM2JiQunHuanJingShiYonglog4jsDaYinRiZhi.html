@@ -1,0 +1,221 @@
+<html>
+<head>
+
+    <!-- header.ftl -->
+<title>PM2集群环境使用log4js打印日志 | Lab 023</title>
+<h1><a href="https://lab023.github.io">Lab 023</a></h1>
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<!-- css.ftl -->
+<link href="/css/default_main.css" type="text/css" rel="stylesheet">
+<link href="/css/prism.css" type="text/css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="main_div">
+
+    <div>
+        <h2><a id="PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi" name="PM2集群环境使用log4js打印日志" href="/blog/PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi.html">PM2集群环境使用log4js打印日志</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+                <p>pm2的日志性能很好，但log4js写起来更爽，用Node做开发追求的不就是敏捷开发么？</p>
+<p>&nbsp;</p>
+<p>环境以及安装pm2-intercom</p>
+<pre class="language-javascript"><code>$ node -v
+v10.16.0
+
+$ npm ls log4js express ts-node typescript
+├── express@4.17.1 
+├── log4js@6.1.2 
+├── ts-node@8.4.1 
+└── typescript@3.7.2
+
+$ pm2 -v
+4.1.2
+
+$ pm2 install pm2-intercom</code></pre>
+<p>&nbsp;</p>
+<p>目录结构</p>
+<pre class="language-javascript"><code>src
+├── app.ts
+└── config
+      ├── log4js.json
+      └── pm2.json
+</code></pre>
+<p>&nbsp;</p>
+<p>log4js.json</p>
+<pre class="language-javascript"><code>{
+  "appenders"     : {
+    "console"            : {
+      "type": "console"
+    },
+    "global_out"         : {
+      "type"                : "dateFile",
+      "filename"            : "/home/node/logs/xxProject/global_out",
+      "layout"              : {
+        "type"   : "pattern",
+        "pattern": "|%d|%p|%c|%m|"
+      },
+      "alwaysIncludePattern": true,
+      "pattern"             : "yyyy-MM-dd.log"
+    },
+    "global_error"       : {
+      "type"                : "dateFile",
+      "filename"            : "/home/node/logs/xxProject/global_error",
+      "layout"              : {
+        "type"   : "pattern",
+        "pattern": "|%d|%p|%c|%m|"
+      },
+      "alwaysIncludePattern": true,
+      "pattern"             : "yyyy-MM-dd.log"
+    },
+    "global_error_filter": {
+      "type"    : "logLevelFilter",
+      "appender": "global_error",
+      "level"   : "error"
+    }
+  },
+  "categories"    : {
+    "default": {
+      "appenders"      : [
+        "console",
+        "global_out",
+        "global_error_filter"
+      ],
+      "level"          : "info",
+      "enableCallStack": true
+    }
+  },
+  "pm2"           : true,
+  "pm2InstanceVar": "INSTANCE_ID"
+}
+</code></pre>
+<p>&nbsp;</p>
+<p>app.ts片段</p>
+<pre class="language-javascript"><code>// pm2 install pm2-intercom
+const log4js = require('log4js');
+log4js.configure('./config/log4js.json');</code></pre>
+<p>&nbsp;</p>
+<p>pm2.json</p>
+<pre class="language-javascript"><code>{
+  "apps": [
+    {
+      "name"           : "xxProject",
+      "instances"      : 4,
+      "exec_mode"      : "cluster",
+      "script"         : "../node_modules/.bin/ts-node",
+      "args"           : "-P ../tsconfig.json -r tsconfig-paths/register ./app.js",
+      "watch"          : false,
+      "ignore_watch"   : [
+        "node_modules"
+      ],
+      "env"            : {
+        "TZ"       : "Asia/Shanghai",
+        "NODE_PATH": ".",
+        "NODE_ENV" : "development"
+      },
+      "env_production" : {
+        "TZ"       : "Asia/Shanghai",
+        "NODE_PATH": ".",
+        "NODE_ENV" : "production"
+      },
+      "error_file"     : "/dev/null",
+      "out_file"       : "/dev/null",
+      "combine_logs"   : true,
+      "log_date_format": "YYYY-MM-DD HH:mm Z",
+      "instance_var"   : "INSTANCE_ID"
+    }
+  ]
+}</code></pre>
+<p>&nbsp;</p>
+<p>启动命令 package.json -&gt;&nbsp;scripts</p>
+<pre class="language-javascript"><code>  {
+    "build:rm"  : "rm -rf dist/ &amp;&amp; mkdir dist/",
+    "build:copy": "cp -r src/config/ dist/",
+    "build"     : "npm run build:rm &amp;&amp; npm run build:copy &amp;&amp; node_modules/.bin/tsc -b",
+    "buildOnly" : "npm run build:copy &amp;&amp; node_modules/.bin/tsc -b",
+    "watch"     : "npm run build:rm &amp;&amp; npm run build:copy &amp;&amp; node_modules/.bin/tsc-watch",
+    "dev"       : "cd src &amp;&amp; env TZ='Asia/Shanghai' NODE_PATH=. NODE_ENV=development ../node_modules/.bin/ts-node -P ../tsconfig.json -r tsconfig-paths/register ./app.ts",
+    "pm2dev"    : "npm run buildOnly &amp;&amp; cd dist/ &amp;&amp; pm2 startOrGracefulReload config/pm2.json",
+    "pm2"       : "cd dist/ &amp;&amp; pm2 startOrGracefulReload config/pm2.json --env production"
+  }</code></pre>
+<p>&nbsp;</p>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-d8757dce543f45eb8a40aeeaa5949d81-1.html?f=Node开发">Node开发 1</a> </div>
+            <div class="blog_sign"><a>Roy</a><a>2020-2-22</a></div>
+        </div>
+    </div>
+
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {
+    this.page.url = 'https://lab023.github.io/blog/PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi.html';
+    this.page.identifier = 'PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi';
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lab023.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<!-- footer.ftl -->
+<script>
+var flag = false;
+function showDonation(){
+    if(flag){
+        flag = false;
+        document.getElementsByClassName('d-donation')[0].style.display = 'none';
+    }else{
+        flag = true;
+        document.getElementsByClassName('d-donation')[0].style.display = 'block';
+    }
+}
+</script>
+
+<div class="d-donation">
+    <ul>
+        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
+    </ul>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/lab023/lab023.github.io/issues" >报告错误</a> | <a href="/LICENSE.txt" target="_blank">代码许可</a> | <a href="javascript:void(0);"  onclick="showDonation()">赞助一下</a></p>
+</div>
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-130961613-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-130961613-1');
+</script>
+</div>
+
+<!-- js.ftl -->
+<script src="/js/prism.js"></script>
+<script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+</body>
+</html>
