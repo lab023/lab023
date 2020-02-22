@@ -31,6 +31,20 @@
 <div class="main_div">
 
     <div>
+        <h2><a id="Windows10MingLingXingTCPDuanKouZhuanFa" name="Windows 10命令行TCP端口转发" href="/blog/Windows10MingLingXingTCPDuanKouZhuanFa.html">Windows 10命令行TCP端口转发</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <p>添加端口转发：通过本机 192.168.1.88:60544访问远程地址192.168.1.103:6544</p>
+<pre class="language-javascript"><code>netsh interface portproxy add v4tov4 listenaddress=192.168.1.88 listenport=60544 connectaddress=192.168.1.103 connectport=6544</code></pre>
+<p>&nbsp;</p>
+<p>删除端口转发</p>
+<pre class="language-javascript"><code>netsh interface portproxy delete v4tov4 listenaddress=192.168.1.88 listenport=60544</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-ef329eb2b5b3407e87ec9d610fe16a20-1.html?f=Batch">Batch 1</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/Windows10MingLingXingTCPDuanKouZhuanFa.html#disqus_thread">0 讨论</a><a>Roy</a><a>2020-2-22</a></div>
+        </div>
+    </div>
+    <div>
         <h2><a id="PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi" name="PM2集群环境使用log4js打印日志" href="/blog/PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi.html">PM2集群环境使用log4js打印日志</a></h2>
         <div class="blog_unit">
             <div class="blog_content">
@@ -281,51 +295,6 @@ Vue.use(MyPlugin)</code></pre>
             </div>
             <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a><a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a></div>
             <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookNeiHeCanShuDiaoYou.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
-        </div>
-    </div>
-    <div>
-        <h2><a id="AnsiblePlaybookChuangJianappYongHu" name="Ansible Playbook创建app用户" href="/blog/AnsiblePlaybookChuangJianappYongHu.html">Ansible Playbook创建app用户</a></h2>
-        <div class="blog_unit">
-            <div class="blog_content">
-            <pre class="language-yaml"><code>---
-# ansible-playbook -l app1 02_PRO_UlimitApp.yml
-# It works with new version openssh. openssh-5.3 has lots of bugs.
-- name: create user and ulimit [0.0.2]
-  hosts: all
-  gather_facts: no
-  vars:
-    uuser: nginx
-
-  tasks:
-    - name: create user
-      shell: useradd {{ uuser }}
-      ignore_errors: true
-
-    - name: passwd lock user
-      shell: passwd -l {{ uuser }}
-      ignore_errors: true
-
-    - name: modify /etc/security/limit.conf
-      pam_limits: domain={{ item.domain }} limit_type={{ item.type }} limit_item={{ item.item }} value={{ item.value }}
-      ignore_errors: True
-      with_items:
-        - { domain: '{{uuser}}', type: 'soft', item: 'nofile', value: '63536' }
-        - { domain: '{{uuser}}', type: 'hard', item: 'nofile', value: '63536' }
-        - { domain: '{{uuser}}', type: 'soft', item: 'nproc', value: '63536' }
-        - { domain: '{{uuser}}', type: 'hard', item: 'nproc', value: '63536' }
-
-    - name: show process
-      shell: ulimit -a
-      become_user: "{{ uuser }}"
-      with_items:
-        - "{{ uuser }}"
-      ignore_errors: True
-      register: ulimitOut
-
-    - debug: msg="ulimit -a ~&gt; {{ ulimitOut }}"</code></pre>
-            </div>
-            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a><a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a></div>
-            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookChuangJianappYongHu.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
         </div>
     </div>
 

@@ -31,6 +31,51 @@
 <div class="main_div">
 
     <div>
+        <h2><a id="AnsiblePlaybookChuangJianappYongHu" name="Ansible Playbook创建app用户" href="/blog/AnsiblePlaybookChuangJianappYongHu.html">Ansible Playbook创建app用户</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <pre class="language-yaml"><code>---
+# ansible-playbook -l app1 02_PRO_UlimitApp.yml
+# It works with new version openssh. openssh-5.3 has lots of bugs.
+- name: create user and ulimit [0.0.2]
+  hosts: all
+  gather_facts: no
+  vars:
+    uuser: nginx
+
+  tasks:
+    - name: create user
+      shell: useradd {{ uuser }}
+      ignore_errors: true
+
+    - name: passwd lock user
+      shell: passwd -l {{ uuser }}
+      ignore_errors: true
+
+    - name: modify /etc/security/limit.conf
+      pam_limits: domain={{ item.domain }} limit_type={{ item.type }} limit_item={{ item.item }} value={{ item.value }}
+      ignore_errors: True
+      with_items:
+        - { domain: '{{uuser}}', type: 'soft', item: 'nofile', value: '63536' }
+        - { domain: '{{uuser}}', type: 'hard', item: 'nofile', value: '63536' }
+        - { domain: '{{uuser}}', type: 'soft', item: 'nproc', value: '63536' }
+        - { domain: '{{uuser}}', type: 'hard', item: 'nproc', value: '63536' }
+
+    - name: show process
+      shell: ulimit -a
+      become_user: "{{ uuser }}"
+      with_items:
+        - "{{ uuser }}"
+      ignore_errors: True
+      register: ulimitOut
+
+    - debug: msg="ulimit -a ~&gt; {{ ulimitOut }}"</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 9</a> <a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a><a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookChuangJianappYongHu.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
+        </div>
+    </div>
+    <div>
         <h2><a id="AnsiblePlaybookAnZhuangJiChuZuJian" name="Ansible Playbook安装基础组件" href="/blog/AnsiblePlaybookAnZhuangJiChuZuJian.html">Ansible Playbook安装基础组件</a></h2>
         <div class="blog_unit">
             <div class="blog_content">
