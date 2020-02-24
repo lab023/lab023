@@ -2,7 +2,7 @@
 <head>
 
     <!-- header.ftl -->
-<title>标签: OpenSSH 第1页 总1页 | Lab 023</title>
+<title>第3页 | Lab 023</title>
 <h1><a href="https://lab023.github.io">Lab 023</a></h1>
 <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
 <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
@@ -31,57 +31,76 @@
 <div class="main_div">
 
     <div>
-        <h2><a id="AnsiblePlaybookZiDongPeiZhiSSH" name="Ansible Playbook自动配置SSH" href="/blog/AnsiblePlaybookZiDongPeiZhiSSH.html">Ansible Playbook自动配置SSH</a></h2>
+        <h2><a id="IntelliJIDEAIUShuJuKuJiaoBenDaoChuJavaScriptDuiXiang" name="IntelliJ IDEA IU数据库脚本: 导出JavaScript对象" href="/blog/IntelliJIDEAIUShuJuKuJiaoBenDaoChuJavaScriptDuiXiang.html">IntelliJ IDEA IU数据库脚本: 导出JavaScript对象</a></h2>
         <div class="blog_unit">
             <div class="blog_content">
-            <pre class="language-yaml"><code>---
-- name: 16_PRO_SSHConfig.yml
-  hosts: all
-  gather_facts: yes
-  vars:
-    allow_root: True
-    allow_password: False
-    ssh_port: 34522
-    ssh_change_port: True
-
-  tasks:
-    - name: Delete GSS
-      lineinfile: dest=/etc/ssh/sshd_config state=absent regexp=".*GSS.*"
-  
-    - name: Set UseDNS no
-      lineinfile: dest=/etc/ssh/sshd_config regexp=".*UseDNS.*" line="UseDNS no"
-
-    - name: if permit root login via publickey
-      lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin " insertafter="^#PermitRootLogin " line="PermitRootLogin without-password" 
-      when: allow_root == 'True'
-
-    - name: if not allow rootlogin
-      lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin " insertafter="^#PermitRootLogin " line="PermitRootLogin no"
-      when: allow_root == 'False'
-
-    - lineinfile: dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication" line="PasswordAuthentication yes"
-      when: allow_password == 'True'
-
-    - lineinfile: dest=/etc/ssh/sshd_config regexp="^PasswordAuthentication " line="PasswordAuthentication no"
-      when: allow_password == 'False'
-
-    - lineinfile: dest=/etc/ssh/sshd_config regexp="^RSAAuthentication " line="RSAAuthentication yes"
-      when: allow_password == 'False'
-
-    - lineinfile: dest=/etc/ssh/sshd_config regexp="^PubkeyAuthentication " line="PubkeyAuthentication yes"
-      when: allow_password == 'False'
-
-    - lineinfile: dest=/etc/ssh/sshd_config regexp="^AuthorizedKeysFile " line="AuthorizedKeysFile .ssh/authorized_keys"
-      when: allow_password == 'False'
-
-    - lineinfile: dest=/etc/ssh/sshd_config regexp=".*Port.*" line="Port {{ssh_port}}"
-      when: ssh_change_port == 'True'
-
-    - name: restart sshd service
-      service: name=sshd state=restarted</code></pre>
+            <p>使用方法: Database -&gt; 右键数据库表 -&gt; Scripted Extensions -&gt; vuejs.groovy</p>
+<p>生成Vue.js对象</p>
+<p>内详</p>
             </div>
-            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 10</a> <a class="a-tag" href="/tag/tag-482538027af8443d85893018b8c04b49-1.html?f=Ansible">Ansible 5</a><a class="a-tag" href="/tag/tag-8be888738248407aa574057256d807ad-1.html?f=OpenSSH">OpenSSH 2</a><a class="a-tag" href="/tag/tag-84d17d6b3e6f46548ef355a351332ab6-1.html?f=CentOS">CentOS 5</a></div>
-            <div class="blog_sign"><a href="https://lab023.github.io/blog/AnsiblePlaybookZiDongPeiZhiSSH.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-9</a></div>
+            <div class="blog_type"><a class="a-type" href="/type/type-6cdd2a3f3bfb46cfa2c8b34ffdffcb1e-1.html?f=Java开发">Java开发 6</a> <a class="a-tag" href="/tag/tag-ecdfbaec143d4868992f4f8272a6995b-1.html?f=Vue.js">Vue.js 2</a><a class="a-tag" href="/tag/tag-75ce94fedc024798b7cb5c9b90989b6e-1.html?f=Spring">Spring 2</a><a class="a-tag" href="/tag/tag-ba22da08d37249a6b09743a96d3fac0c-1.html?f=JavaScript">JavaScript 1</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/IntelliJIDEAIUShuJuKuJiaoBenDaoChuJavaScriptDuiXiang.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-5-3</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="ZhangQiGengXinMavenCommandTips" name="「长期更新」Maven Command Tips" href="/blog/ZhangQiGengXinMavenCommandTips.html">「长期更新」Maven Command Tips</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <pre class="language-bash"><code># 查看当前生效的配置文件
+mvn help:effective-settings</code></pre>
+<pre class="language-bash"><code># 打包跳过单元测试
+mvn clean package -Dmaven.test.skip=true</code></pre>
+<pre class="language-bash"><code># 解决项目依赖
+mvn dependency:resolve</code></pre>
+<pre class="language-bash"><code># 显示树状依赖
+mvn dependency:tree</code></pre>
+<pre class="language-bash"><code># 发布到Nexus 需要在settings里面配置鉴权
+mvn deploy:deploy-file \
+    -DgroupId=com.xxxx \
+    -DartifactId=interclient \
+    -Dversion=7u4  \
+    -Dpackaging=jar \
+    -Durl=http://192.168.1.100:8081/nexus/content/repositories/xx-repositories/ \
+    -DrepositoryId=xx-repositories \
+    -Dusername=admin \
+    -Dpassword=adminpass \
+    -Dfile=/home/a/b/interclient.jar</code></pre>
+<pre class="language-bash"><code># 安装到本地仓库
+mvn install:install-file \
+-DgroupId=dom4j \
+-DartifactId=dom4j \
+-Dversion=1.6.1 \
+-Dpackaging=jar \
+-Dfile=/media/Software/Software/Cross/lib/poi-3.7/ooxml-lib/dom4j-1.6.1.jar</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-6cdd2a3f3bfb46cfa2c8b34ffdffcb1e-1.html?f=Java开发">Java开发 6</a> <a class="a-tag" href="/tag/tag-12cf29b023e54104a874b32184349840-1.html?f=Maven">Maven 1</a><a class="a-tag" href="/tag/tag-e75db186149a4d2fb15c5d1dba530356-1.html?f=Java">Java 2</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/ZhangQiGengXinMavenCommandTips.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-4-30</a></div>
+        </div>
+    </div>
+    <div>
+        <h2><a id="JiVPSTianJiaSWAPFenQu" name="给VPS添加SWAP分区" href="/blog/JiVPSTianJiaSWAPFenQu.html">给VPS添加SWAP分区</a></h2>
+        <div class="blog_unit">
+            <div class="blog_content">
+            <p><i>以root账户执行以下命令</i></p>
+<pre class="language-bash"><code># 创建一个2GB大小的SWAP文件
+dd if=/dev/zero of=/swapfile bs=1k count=2097152
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+swapon -s
+echo "/swapfile none swap sw 0 0" &gt;&gt; /etc/fstab
+
+# 挂载SWAP分区
+swapon -a
+
+# 卸载SWAP分区
+swapoff -a
+
+# 查看SWAP分区使用情况
+free -m</code></pre>
+            </div>
+            <div class="blog_type"><a class="a-type" href="/type/type-e89135adf3fd41b18ad0b9f6f11d969b-1.html?f=运维">运维 10</a> <a class="a-tag" href="/tag/tag-885e26674e5f4470b0c0343cb0c71c4a-1.html?f=Virtualization">Virtualization 1</a><a class="a-tag" href="/tag/tag-d8d3d6455d28426a88148d3b26cad46d-1.html?f=Linux">Linux 4</a></div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/JiVPSTianJiaSWAPFenQu.html#disqus_thread">0 讨论</a><a>Roy</a><a>2019-4-15</a></div>
         </div>
     </div>
     <div>
@@ -143,7 +162,8 @@ Host host1
 
 <!-- pagination.ftl -->
 <div class="d-pagination">
-    </div>
+        <a class="a-pagination previous" href="/list/list-1.html">上页</a>
+</div>
 <!-- footer.ftl -->
 <script>
 var flag = false;
