@@ -403,8 +403,8 @@ function showDonation(){
 
 <div class="d-donation">
     <ul>
-        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
-        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><img alt="Donate by WeChat" src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img alt="Donate by AliPay" src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
         <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
     </ul>
 </div>
@@ -424,8 +424,28 @@ function showDonation(){
 </script>
 </div>
 
+<div class="side_div">
+    <input type="text" id="search-input" onkeyup="blogSearch()" placeholder="搜索博客...">
+
+    <ul id="search-result">
+    </ul>
+</div>
+
 <!-- js.ftl -->
 <script src="/js/prism.js"></script>
+<script src="/js/fuse.js"></script>
 <script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+
+<script>
+  var midWidth                                                = document.getElementsByTagName("body")[0].offsetWidth;
+  var windowWidth                                             = document.getElementsByTagName("html")[0].offsetWidth;
+  var windowHeight                                            = window.innerHeight;
+  var sideWidth                                               = Math.floor((windowWidth - midWidth) / 2) - 20;
+  var sideHeight                                              = windowHeight - 20;
+  document.getElementsByClassName("side_div")[0].style.width  = sideWidth + 'px';
+  document.getElementsByClassName("side_div")[0].style.height = sideHeight + 'px';
+</script>
+
+
 </body>
 </html>

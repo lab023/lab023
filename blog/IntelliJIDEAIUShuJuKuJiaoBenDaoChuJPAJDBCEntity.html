@@ -405,8 +405,8 @@ function showDonation(){
 
 <div class="d-donation">
     <ul>
-        <li><img src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
-        <li><img src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
+        <li><img alt="Donate by WeChat" src="/image/wechat.jpg" style="background-color:#22aa3b" class="img-donation" onclick="showDonation()"/>微信</li>
+        <li><img alt="Donate by AliPay" src="/image/alipay.jpg" style="background-color:#029ee8" class="img-donation" onclick="showDonation()"/>支付宝</li>
         <li><a style="font-size: 24px; font-weight: bold; padding: 0.5em" href="https://www.paypal.me/roy334">PayPal.me</a></li>
     </ul>
 </div>
@@ -428,6 +428,42 @@ function showDonation(){
 
 <!-- js.ftl -->
 <script src="/js/prism.js"></script>
+<script src="/js/fuse.js"></script>
 <script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
+
+<#-- 侧边栏位置 -->
+<script>
+  var midWidth                                                = document.getElementsByTagName("body")[0].offsetWidth;
+  var windowWidth                                             = document.getElementsByTagName("html")[0].offsetWidth;
+  var windowHeight                                            = window.innerHeight;
+  var sideWidth                                               = Math.floor((windowWidth - midWidth) / 2) - 20;
+  var sideHeight                                              = windowHeight - 20;
+  document.getElementsByClassName("side_div")[0].style.width  = sideWidth + 'px';
+  document.getElementsByClassName("side_div")[0].style.height = sideHeight + 'px';
+</script>
+
+<#-- 博客搜索 -->
+<#if searchList??>
+<script>
+  var books = ${searchList};
+
+  var options = {
+    keys: ['title', 'uri', 'subType', 'tags']
+  };
+  var fuse    = new Fuse(books, options);
+  console.log('search -> ', fuse.search(''));
+
+  function blogSearch () {
+    var text   = document.getElementById("search-input").value;
+    var ulNode = document.getElementById('search-result');
+    var list   = fuse.search(text);
+    var lis    = '';
+    for (var i = 0; i < list.length; i++) {
+      lis += '<li><span class="a-type">' + list[i].subType + '</span><a href="/blog/' + list[i].uri +'.html">' + list[i].title + '</a></li>\n';
+    }
+    ulNode.innerHTML = lis;
+  }
+</script>
+</#if>
 </body>
 </html>

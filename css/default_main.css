@@ -1,60 +1,60 @@
 html {
-	margin:auto;
-	padding-top: 10px;
-	background-color: transparent;
+    margin: auto;
+    padding-top: 10px;
+    background-color: transparent;
 }
 
-body a img{
-	display:none;
+body a img {
+    display: none;
 }
 
 body {
-	padding: 0 10px;
-	display:block;
-	font-family: "Trebuchet MS",verdana,lucida,arial,helvetica,sans-serif;
-	width:974px;
-	margin:auto;
-	line-height: 1.6;
-	color:#666666;
-	box-shadow: 2px 2px 10px #909090;
-	border-radius: 3px;
+    padding: 0 10px;
+    display: block;
+    font-family: "Trebuchet MS", verdana, lucida, arial, helvetica, sans-serif;
+    width: 974px;
+    margin: auto;
+    line-height: 1.6;
+    color: #666666;
+    box-shadow: 2px 2px 10px #909090;
+    border-radius: 3px;
 }
 
 h1 {
-	font-size: 2.1em;
-	padding-left:1.5em;
-	padding-top:1em;
-	margin-top: 0;
+    font-size: 2.1em;
+    padding-left: 1.5em;
+    padding-top: 1em;
+    margin-top: 0;
 }
 
-h1 a{
+h1 a {
     cursor: pointer;
-    color:#86C230;
+    color: #86C230;
 }
 
 h2 {
-	margin-left: 3%;
+    margin-left: 3%;
 }
 
 a:link {
     color: #86C230;
     cursor: pointer;
-	text-decoration: none;
+    text-decoration: none;
 }
 
 a:active {
-	color: #999;
-	text-decoration: none
+    color: #999;
+    text-decoration: none
 }
 
 a:visited {
-	color: #86C230;
-	text-decoration: none
+    color: #86C230;
+    text-decoration: none
 }
 
 a:hover {
-	background-color:#E0FFFF;
-	text-decoration: none;
+    background-color: #E0FFFF;
+    text-decoration: none;
 }
 
 /* 主框 */
@@ -62,9 +62,19 @@ div.main_div {
     margin: 2em 1em 1em;
 }
 
+div.side_div {
+    height: 100px;
+    background: transparent;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 200px;
+    border-radius: 3px;
+}
+
 /* 页脚 */
 div.footer {
-    // position: fixed;
+    /*position: fixed;*/
     left: 0;
     bottom: 0;
     display: block;
@@ -119,20 +129,20 @@ div.blog_sign a {
 
 div.blog_sign a {
     cursor: pointer;
-	color: #86C230;
-	text-decoration: none
+    color: #86C230;
+    text-decoration: none
 }
 
 div.blog_sign a:visited {
     cursor: pointer;
-	color: #86C230;
-	text-decoration: none
+    color: #86C230;
+    text-decoration: none
 }
 
 div.blog_sign a:hover {
     cursor: pointer;
-	color: #86C230;
-	text-decoration: none
+    color: #86C230;
+    text-decoration: none
 }
 
 
@@ -143,7 +153,7 @@ div.blog_content {
     word-break: break-all;
 }
 
-a.a-type {
+a.a-type, span.a-type {
     cursor: pointer;
     color: white;
     padding: 0.5em;
@@ -171,18 +181,18 @@ div.d-pagination a {
 
 /* footer */
 div.footer a {
-    padding: 0.5em!important;
+    padding: 0.5em !important;
 }
 
 .d-donation {
     margin: 0 auto;
     text-align: center;
-    display:none;
+    display: none;
     position: fixed;
     bottom: 100px;
 }
 
-.d-donation li{
+.d-donation li {
     background-color: white;
     display: inline-grid;
 }
@@ -192,4 +202,25 @@ div.footer a {
     width: 256px;
     height: 256px;
     background-color: transparent;
+}
+
+#search-input {
+    height: 30px;
+    width: 100%;
+    line-height: 30px;
+    padding: 10px;
+}
+
+#search-result {
+    padding-inline-start: 10px;
+}
+
+ul#search-result li {
+    margin-bottom: 0.7em;
+    list-style-type: none;
+    text-align: left;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
