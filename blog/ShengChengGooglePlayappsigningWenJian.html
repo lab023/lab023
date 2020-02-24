@@ -2,7 +2,7 @@
 <head>
 
     <!-- header.ftl -->
-<title>标签: log4js 第1页 总1页 | Lab 023</title>
+<title>生成Google Play app signing文件 | Lab 023</title>
 <h1><a href="https://lab023.github.io">Lab 023</a></h1>
 <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
 <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
@@ -31,19 +31,36 @@
 <div class="main_div">
 
     <div>
-        <h2><a id="PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi" name="PM2集群环境使用log4js打印日志" href="/blog/PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi.html">PM2集群环境使用log4js打印日志</a></h2>
+        <h2><a id="ShengChengGooglePlayappsigningWenJian" name="生成Google Play app signing文件" href="/blog/ShengChengGooglePlayappsigningWenJian.html">生成Google Play app signing文件</a></h2>
         <div class="blog_unit">
             <div class="blog_content">
-            <p>pm2的日志性能很好，但log4js写起来更爽，用Node做开发追求的不就是敏捷开发么？</p>
+                <p>如果要使用Android App Bundle格式文件上传Google Play，就必须使用Google Play app signing。</p>
+<p>官方邮件建议命令：</p>
+<pre class="language-javascript"><code>keytool -genkeypair -alias upload -keyalg RSA -keysize 2048 -validity 9125 -keystore keystore.jks
+keytool -export -rfc -alias upload -file upload_certificate.pem -keystore keystore.jks</code></pre>
+<p>&nbsp;</p>
+<p>另：签名是全局的，如果App要单独使用签名需要发邮件。</p>
             </div>
-            <div class="blog_type"><a class="a-type" href="/type/type-d8757dce543f45eb8a40aeeaa5949d81-1.html?f=Node开发">Node开发 1</a> <a class="a-tag" href="/tag/tag-61bf7f7acabb40fd80b898f993a17b43-1.html?f=pm2">pm2 1</a><a class="a-tag" href="/tag/tag-da360ee28b8e413e80ccaa8e86fcda90-1.html?f=log4js">log4js 1</a></div>
-            <div class="blog_sign"><a href="https://lab023.github.io/blog/PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi.html#disqus_thread">0 讨论</a><a>Roy</a><a>2020-2-22</a></div>
+            <div class="blog_type"><a class="a-type" href="/type/type-0307eab94117482eb49ac0e1b24b6b79-1.html?f=Android开发">Android开发 1</a> </div>
+            <div class="blog_sign"><a>Roy</a><a>2020-2-24</a></div>
         </div>
     </div>
 
-<!-- pagination.ftl -->
-<div class="d-pagination">
-    </div>
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {
+    this.page.url = 'https://lab023.github.io/blog/ShengChengGooglePlayappsigningWenJian.html';
+    this.page.identifier = 'ShengChengGooglePlayappsigningWenJian';
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://lab023.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
 <!-- footer.ftl -->
 <script>
 var flag = false;
@@ -81,18 +98,12 @@ function showDonation(){
 </script>
 </div>
 
-<div class="side_div">
-    <input type="text" id="search-input" onkeyup="blogSearch()" placeholder="搜索博客...">
-
-    <ul id="search-result">
-    </ul>
-</div>
-
 <!-- js.ftl -->
 <script src="/js/prism.js"></script>
 <script src="/js/fuse.js"></script>
 <script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
 
+<#-- 侧边栏位置 -->
 <script>
   var midWidth                                                = document.getElementsByTagName("body")[0].offsetWidth;
   var windowWidth                                             = document.getElementsByTagName("html")[0].offsetWidth;
@@ -103,6 +114,28 @@ function showDonation(){
   document.getElementsByClassName("side_div")[0].style.height = sideHeight + 'px';
 </script>
 
+<#-- 博客搜索 -->
+<#if searchList??>
+<script>
+  var books = ${searchList};
 
+  var options = {
+    keys: ['title', 'uri', 'subType', 'tags']
+  };
+  var fuse    = new Fuse(books, options);
+  console.log('search -> ', fuse.search(''));
+
+  function blogSearch () {
+    var text   = document.getElementById("search-input").value;
+    var ulNode = document.getElementById('search-result');
+    var list   = fuse.search(text);
+    var lis    = '';
+    for (var i = 0; i < list.length; i++) {
+      lis += '<li><span class="a-type">' + list[i].subType + '</span><a href="/blog/' + list[i].uri +'.html">' + list[i].title + '</a></li>\n';
+    }
+    ulNode.innerHTML = lis;
+  }
+</script>
+</#if>
 </body>
 </html>

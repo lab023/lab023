@@ -2,7 +2,7 @@
 <head>
 
     <!-- header.ftl -->
-<title>标签: log4js 第1页 总1页 | Lab 023</title>
+<title>类型: Android开发 第1页 总1页 | Lab 023</title>
 <h1><a href="https://lab023.github.io">Lab 023</a></h1>
 <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
 <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
@@ -31,13 +31,18 @@
 <div class="main_div">
 
     <div>
-        <h2><a id="PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi" name="PM2集群环境使用log4js打印日志" href="/blog/PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi.html">PM2集群环境使用log4js打印日志</a></h2>
+        <h2><a id="ShengChengGooglePlayappsigningWenJian" name="生成Google Play app signing文件" href="/blog/ShengChengGooglePlayappsigningWenJian.html">生成Google Play app signing文件</a></h2>
         <div class="blog_unit">
             <div class="blog_content">
-            <p>pm2的日志性能很好，但log4js写起来更爽，用Node做开发追求的不就是敏捷开发么？</p>
+            <p>如果要使用Android App Bundle格式文件上传Google Play，就必须使用Google Play app signing。</p>
+<p>官方邮件建议命令：</p>
+<pre class="language-javascript"><code>keytool -genkeypair -alias upload -keyalg RSA -keysize 2048 -validity 9125 -keystore keystore.jks
+keytool -export -rfc -alias upload -file upload_certificate.pem -keystore keystore.jks</code></pre>
+<p>&nbsp;</p>
+<p>另：签名是全局的，如果App要单独使用签名需要发邮件。</p>
             </div>
-            <div class="blog_type"><a class="a-type" href="/type/type-d8757dce543f45eb8a40aeeaa5949d81-1.html?f=Node开发">Node开发 1</a> <a class="a-tag" href="/tag/tag-61bf7f7acabb40fd80b898f993a17b43-1.html?f=pm2">pm2 1</a><a class="a-tag" href="/tag/tag-da360ee28b8e413e80ccaa8e86fcda90-1.html?f=log4js">log4js 1</a></div>
-            <div class="blog_sign"><a href="https://lab023.github.io/blog/PM2JiQunHuanJingShiYonglog4jsDaYinRiZhi.html#disqus_thread">0 讨论</a><a>Roy</a><a>2020-2-22</a></div>
+            <div class="blog_type"><a class="a-type" href="/type/type-0307eab94117482eb49ac0e1b24b6b79-1.html?f=Android开发">Android开发 1</a> </div>
+            <div class="blog_sign"><a href="https://lab023.github.io/blog/ShengChengGooglePlayappsigningWenJian.html#disqus_thread">0 讨论</a><a>Roy</a><a>2020-2-24</a></div>
         </div>
     </div>
 
