@@ -89,12 +89,17 @@ $ pm2 install pm2-intercom</code></pre>
       "type"    : "logLevelFilter",
       "appender": "global_error",
       "level"   : "error"
+    },
+    "console_info_filter": {
+      "type"    : "logLevelFilter",
+      "appender": "console",
+      "level"   : "info"
     }
   },
   "categories"    : {
     "default": {
       "appenders"      : [
-        "console",
+        "console_info_filter",
         "global_out",
         "global_error_filter"
       ],
@@ -110,13 +115,20 @@ $ pm2 install pm2-intercom</code></pre>
 <p>app.ts片段</p>
 <pre class="language-javascript"><code>// pm2 install pm2-intercom
 const log4js = require('log4js');
-log4js.configure('./config/log4js.json');</code></pre>
+log4js.configure('./config/log4js.json');
+const logger  = log4js.getLogger('console');
+console.log   = logger.info.bind(logger);
+console.info  = logger.info.bind(logger);
+console.error = logger.error.bind(logger);
+console.debug = logger.debug.bind(logger);
+console.trace = logger.trace.bind(logger);
+console.warn  = logger.warn.bind(logger);</code></pre>
 <p>&nbsp;</p>
 <p>pm2.json</p>
 <pre class="language-javascript"><code>{
   "apps": [
     {
-      "name"           : "xxProject",
+      "name"           : "MobileFreelancer",
       "instances"      : 4,
       "exec_mode"      : "cluster",
       "script"         : "../node_modules/.bin/ts-node",
@@ -135,7 +147,7 @@ log4js.configure('./config/log4js.json');</code></pre>
         "NODE_PATH": ".",
         "NODE_ENV" : "production"
       },
-      "error_file"     : "/dev/null",
+      "error_file"     : "/home/node/logs/xxProject/pm2-error.log",
       "out_file"       : "/dev/null",
       "combine_logs"   : true,
       "log_date_format": "YYYY-MM-DD HH:mm Z",
