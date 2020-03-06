@@ -68,7 +68,7 @@ div.side_div {
     position: fixed;
     top: 10px;
     right: 10px;
-    width: 200px;
+    width: 0;
     border-radius: 3px;
 }
 
