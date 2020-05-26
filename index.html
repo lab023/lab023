@@ -306,7 +306,7 @@ function showDonation(){
 </script>
 </div>
 
-<div class="side_div">
+<div class="side_div" style="display: none">
     <input type="text" id="search-input" onkeyup="blogSearch()" placeholder="搜索博客...">
 
     <ul id="search-result">
@@ -319,13 +319,14 @@ function showDonation(){
 <script id="dsq-count-scr" src="//lab023.disqus.com/count.js" async></script>
 
 <script>
-  var midWidth                                                = document.getElementsByTagName("body")[0].offsetWidth;
-  var windowWidth                                             = document.getElementsByTagName("html")[0].offsetWidth;
-  var windowHeight                                            = window.innerHeight;
-  var sideWidth                                               = Math.floor((windowWidth - midWidth) / 2) - 20;
-  var sideHeight                                              = windowHeight - 20;
-  document.getElementsByClassName("side_div")[0].style.width  = sideWidth + 'px';
-  document.getElementsByClassName("side_div")[0].style.height = sideHeight + 'px';
+  var midWidth                                                 = document.getElementsByTagName("body")[0].offsetWidth;
+  var windowWidth                                              = document.getElementsByTagName("html")[0].offsetWidth;
+  var windowHeight                                             = window.innerHeight;
+  var sideWidth                                                = Math.floor((windowWidth - midWidth) / 2) - 20;
+  var sideHeight                                               = windowHeight - 20;
+  document.getElementsByClassName("side_div")[0].style.width   = sideWidth + 'px';
+  document.getElementsByClassName("side_div")[0].style.height  = sideHeight + 'px';
+  document.getElementsByClassName("side_div")[0].style.display = 'block';
 </script>
 
 <script>
